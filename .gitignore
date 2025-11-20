@@ -421,3 +421,20 @@ bin/
 .vscode/
 
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij,intellij+iml,intellij+all,gradle,visualstudiocode,git,macos,windows,linux
+
+# === Sensitive / Local Config ===
+# Local application property files containing API keys or secrets
+application-local.properties
+application-secret.properties
+*.secret.properties
+*.local.properties
+
+# === Environment Variables ===
+.env
+.env.*
+!.env.example
+
+# === Local-only Config Files ===
+*.local.yaml
+*.local.yml
+*.local.json
