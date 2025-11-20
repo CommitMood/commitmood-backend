@@ -1,93 +1,179 @@
-# CommitMood_Backend
+# 🌙 CommitMood
 
 
+### ✨ 개발자의 감정을 커밋 메시지로 읽어내는 서비스 ✨
+**GitHub 커밋 메시지를 수집·분석하여 감정, 패턴, 습관을 시각화합니다.**
 
-## Getting started
+<br>
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## 📋 목차
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+- [📖 프로젝트 소개](#-프로젝트-소개)
+- [🎯 프로젝트 목표](#-프로젝트-목표)
+- [🛠️ 기술 스택](#️-기술-스택)
+- [🧩 기능 요구사항](#%EF%B8%8F-%EA%B8%B0%EB%8A%A5-%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD)
+- [🌱 Git Branching Strategy](#-git-branching-strategy)
+- [📝 Commit Message Convention](#-commit-message-convention)
+- [📚 상세 문서](#-상세-문서)
 
-## Add your files
+<br>
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+## 📖 프로젝트 소개
 
+> **CommitMood**는 개발자의 GitHub 커밋 메시지에서 감정, 작업 패턴, 활동 리듬을 분석하여 개발 경험을 더욱 의미 있게 만들어주는 웹 서비스입니다. 개발 여정을 돌아보고, 평소에는 잘 보이지 않던 개발 습관, 감정의 변동, 생산성 신호를 직관적으로 확인할 수 있습니다.
+
+
+### 핵심 기능
+| 구분                  | 설명                                                    |
+|---------------------|-------------------------------------------------------|
+| 🚗 **커밋 데이터 분석 자동화** | GitHub REST API를 활용하여 사용자의 커밋 메시지를 자동으로 수집/분석합니다.     |
+| ✨ **감정 분석**         | 커밋 메시지에서 긍정/부정/감탄사/감정적 표현을 탐지합니다.                     |
+| 📊 **개발 패턴 시각화**     | "가장 많이 커밋한 개발자"를 다양한 기준으로 실시간 랭킹을 제공합니다.              |
+| 🏆 **기여도 지표 제공**     | 기간별 핵심 단어, 감정 편향 등을 분석/시각화하여 사용자 간의 경쟁과 재미 요소를 강화합니다. |
+| 🔍 **개인 히스토리 관리**    | 사용자는 자신의 커밋 감정 기록과 단어 사용 통계를 확인할 수 있습니다.              |
+
+<br>
+
+## 🎯 프로젝트 목표
+
+### 우리가 만드는 가치
+- **셀프 피드백 도구**
+    - 개발자가 스스로의 개발 습관·감정 상태를 객관적으로 파악
+- **데이터 기반 자기 성찰**
+    - commit count가 아닌 ‘내용과 감정’을 분석
+- **생산성 시각화**
+    - 시간대/요일/주기별 개발 리듬 파악
+- **문서 자동화**
+    - 자동 회고/요약 레포트 제공
+
+### 주요 사용자
+- 개발 패턴을 분석하고 싶은 사람
+- GitHub을 자주 사용하는 개발자
+- 팀 감정 분석/헬스 체크가 필요한 팀
+- 자동 회고가 필요한 개발자
+
+<br>
+
+## 🛠️ 기술 스택
+
+### Backend
 ```
-cd existing_repo
-git remote add origin https://lab.ssafy.com/s14/a09/miniproject/11.final-project/commitmood_sunghwan_yeseong/commitmood_backend_sunghwan_yeseong.git
-git branch -M master
-git push -uf origin master
+- Language: Java 21
+- Spring Boot 3.x, Spring Batch, Spring Security
+- MyBatis
+- MySQL 8.0+
+- GitHub REST API
+- OAuth Login
 ```
 
-## Integrate with your tools
+### Frontend
+```
+- Vue.js
+- TailwindCSS
+- Chart.js / ECharts
+```
 
-- [ ] [Set up project integrations](https://lab.ssafy.com/s14/a09/miniproject/11.final-project/commitmood_sunghwan_yeseong/commitmood_backend_sunghwan_yeseong/-/settings/integrations)
+<br>
 
-## Collaborate with your team
+## 🧩 기능 요구사항
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+### 기본 기능
+| 기능             | 요구사항                 | 설명                                                           |
+|----------------|----------------------|--------------------------------------------------------------|
+| **사용자 인증**     | GitHub OAuth 2.0 로그인 | 사용자가 자신의 GitHub 계정을 연동하여 개인 커밋 데이터에 접근                       |
+| **커밋 수집**      | GitHub REST API 연동   | GET /repos/{owner}/{repo}/commits API를 통해 커밋 메시지, 작성자, 날짜 수집 |
+| **데이터 저장**     | DB 스키마 설계 및 저장       | commit_log, user_stat 등 기본 테이블 설계 및 영속화                      |
+| **감정/감탄사 필터링** | 단어 사전 기반 필터링         | 커밋 메시지에서 지정된 단어(ex. 감탄사 등) 감지                                |
+| **랭킹 계산**      | flagged_count 기반 순위  | "가장 잘 작성한" 커밋 기준으로 사용자 랭킹 계산                                 |
+| **기본 UI**      | 명예의 전당 페이지           | "잘 작성한" 커밋을 많이 올린 사용자 TOP3 표시                                |
 
-## Test and Deploy
 
-Use the built-in continuous integration in GitLab.
+### 추가 기능
+| 기능            | 요구사항      | 설명                          |
+|---------------|-----------|-----------------------------|
+| **커밋 분석**     | 커밋 분석 서비스 | 사용자의 커밋 내역 분석 및 시각화         |
+| **Git 랭킹 기능** |           | 유저 간 비교 랭킹 및 리더보드 제공        |
+| **감정 분포 분석**  |           | 긍정/부정 커밋 비율 그래프             |
+| **사용자 검색 기능** |           | 특정 유저/Repository 검색 및 결과 조회 |
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
 
-***
+### 심화 기능
+| 기능                  | 요구사항            | 설멍                                             |
+|---------------------|-----------------|------------------------------------------------|
+| **AI 기반 커밋 평가**     | GPT 등 LLM 활용    | "이 커밋은 얼마나 절망적인가 😩" 같은 AI 코멘트 자동 ㅅ애성           |
+| **Commit Mood Map** | 시각화 대시보드        | 커밋 감정 상태를 달력 히트맵 형태로 표현                        |
+| **팀/조직 단위 분석**      | Org 단위 API 연동   | 회사나 팀별 커밋 데이터 집계 및 비교                          |
+| **API 서버 캐싱 최적화**   | Redis, 메시지 큐 도입 | 대규모 요청 처리 및 비동기 분석 파이프라인 구축                    |
+| **배포 자동화 파이프라인**    | Docker + CI/CD  | GitHub Actions를 활용한 자동 빌드/배포 환경 구성             |
+| **익명 모드/공개 프로필**    | 개인정보 보호         | 닉네임 익명화 및 공개 범위 설정 기능 제공                       |
+| **크롤링**             | 모든 유저 대상 점수화    | GitHub Public Repository를 대상으로 크롤링, 유저마다 점수 부여 |
 
-# Editing this README
+<br>
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## 🌱 Git Branching Strategy
 
-## Suggestions for a good README
+### GitHub Flow
+```
+master: 운용 브랜치
+feature/#issue: 기능 개발 브랜치
+```
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+### Workflow
+1) 이슈 생성
+2) `feature` 브랜치에서 개발
+3) PR 생성
+4) 코드 리뷰
+5) `master`에 merge 및 배포
 
-## Name
-Choose a self-explaining name for your project.
+<br>
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## 📝 Commit Message Convention
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+### 기본 형식
+```plaintext
+[gitmoji] type(#issue): subject
+```
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+### Type
+```
+master
+ └── develop
+ ├── feature/{#issue}
+ ├── fix/{#bug}      // 예비
+ ├── hotfix/{#num}   // 예비
+ └── chore/{#num}    // 예비
+```
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### Commit Prefixes
+```plaintext
+✨ feat: 새로운 기능 추가
+🔨 fix: 버그 수정
+📝 docs: 문서 수정
+🎨 style: 코드 스타일 변경
+♻️ refactor: 코드 리팩토링
+⚡ perf: 성능 개선
+🔍 test: 테스트 코드 추가/수정
+🗂️ chore: 빌드/환경 설정 변경
+🤖 ci: CI/CD 구성 변경
+🚧 wip: 작업 중인 커밋
+🚚 rename: 파일 또는 폴더 이름 변경
+🧹 clean: 불필요한 파일/코드 제거
+🔁 revert: 이전 커밋 되돌리기
+```
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+### Example
+```plaintext
+✨ feat(#12): add commit mood analyzer
+```
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+<br>
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+## 📚 상세 문서
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+- 추후 문서 업로드 예정
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+<br>
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+[status-url]: #
+[status-shield]: https://img.shields.io/badge/status-in%20development-yellow?style=for-the-badge
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
