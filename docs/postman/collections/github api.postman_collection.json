@@ -1,0 +1,179 @@
+{
+  "info": {
+    "_postman_id": "6ed07372-b0fd-4d25-aa12-3afca5c4acfb",
+    "name": "github api",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "follower",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "1706c401-6489-4503-b187-09df90a420d0",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "c9348336-1ba4-45ee-b8b7-fb97c539e68b",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "id": "813493ed-7c3a-4160-92ed-1baf0075d806",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/{{username}}/followers",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "{{username}}",
+            "followers"
+          ],
+          "query": [
+            {
+              "key": "per_page",
+              "value": null,
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "page",
+              "value": null,
+              "type": "text",
+              "disabled": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "commit",
+      "id": "94316be2-e6aa-4629-a6cb-8289bf3d37b5",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/repos/{{owner}}/{{repo}}/commits",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "repos",
+            "{{owner}}",
+            "{{repo}}",
+            "commits"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": null,
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "per_page",
+              "value": null,
+              "type": "text",
+              "disabled": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "repo",
+      "id": "5ab7e245-b1b1-4d4d-a23c-f8824874e18e",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/{{owner}}/repos",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "{{owner}}",
+            "repos"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": null,
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "per_page",
+              "value": null,
+              "type": "text",
+              "disabled": true
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "id": "efee6198-33d8-4c0e-8f9a-6ae1b41e9f7c",
+      "key": "base_url",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "id": "f5d7251f-2722-4ea6-8986-ba452cf40ae7",
+      "key": "owner",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "id": "abe7b33c-4771-410e-b80d-786ec9a0ff00",
+      "key": "repo",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "id": "8da6405d-3742-4396-9659-ab527b973ec2",
+      "key": "username",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}
