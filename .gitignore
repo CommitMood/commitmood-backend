@@ -455,3 +455,4 @@ commitmood-batch/src/main/resources/*.secret.yml
 *.local.yaml
 *.local.yml
 *.local.json
+**/.postman/config.json
