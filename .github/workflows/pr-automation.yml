@@ -1,0 +1,223 @@
+name: PR Automation
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, closed]
+
+jobs:
+  pr-automation:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
+    steps:
+      - name: PR Automation
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const body = pr.body || '';
+            const currentLabels = pr.labels.map(l => l.name);
+            const prNumber = pr.number;
+            
+            // ========================================
+            // 1. Type 라벨 추가
+            // ========================================
+            const typeLabels = ['feat', 'fix', 'refactor', 'docs', 'test', 'chore'];
+            let checkedType = null;
+            
+            for (const type of typeLabels) {
+              if (body.includes(`- [x] ${type}:`) || body.includes(`- [X] ${type}:`)) {
+                checkedType = type;
+                break;
+              }
+            }
+            
+            if (checkedType) {
+              console.log(`✓ 선택된 Type: ${checkedType}`);
+            
+              // 기존 type 라벨 제거
+              const typeLabelsToRemove = currentLabels.filter(label => 
+                typeLabels.includes(label) && label !== checkedType
+              );
+            
+              for (const label of typeLabelsToRemove) {
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: prNumber,
+                    name: label
+                  });
+                  console.log(`🗑️ Removed type label: ${label}`);
+                } catch (error) {
+                  console.log(`⚠️ Failed to remove label ${label}`);
+                }
+              }
+            
+              // 새로운 type 라벨 추가
+              if (!currentLabels.includes(checkedType)) {
+                try {
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: prNumber,
+                    labels: [checkedType.toUpperCase()]
+                  });
+                  console.log(`✅ Added type label: ${checkedType}`);
+                } catch (error) {
+                  console.log(`⚠️ Failed to add label ${checkedType}`);
+                }
+              }
+            } else {
+              console.log('⚠️ Type이 선택되지 않았습니다.');
+            }
+            
+            // ========================================
+            // 2. Priority 라벨 추가
+            // ========================================
+            const priorityLabels = ['P0', 'P1', 'P2', 'P3'];
+            let checkedPriority = null;
+            
+            if (body.includes('- [x] P0') || body.includes('- [X] P0')) {
+              checkedPriority = 'P0';
+            } else if (body.includes('- [x] P1') || body.includes('- [X] P1')) {
+              checkedPriority = 'P1';
+            } else if (body.includes('- [x] P2') || body.includes('- [X] P2')) {
+              checkedPriority = 'P2';
+            } else if (body.includes('- [x] P3') || body.includes('- [X] P3')) {
+              checkedPriority = 'P3';
+            }
+            
+            if (checkedPriority) {
+              console.log(`✓ 선택된 Priority: ${checkedPriority}`);
+            
+              // 기존 Priority 라벨 제거
+              const priorityLabelsToRemove = currentLabels.filter(label => 
+                priorityLabels.includes(label) && label !== checkedPriority
+              );
+            
+              for (const label of priorityLabelsToRemove) {
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: prNumber,
+                    name: label
+                  });
+                  console.log(`🗑️ Removed priority label: ${label}`);
+                } catch (error) {
+                  console.log(`⚠️ Failed to remove label ${label}`);
+                }
+              }
+            
+              // 새로운 Priority 라벨 추가
+              if (!currentLabels.includes(checkedPriority)) {
+                try {
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: prNumber,
+                    labels: [checkedPriority]
+                  });
+                  console.log(`✅ Added priority label: ${checkedPriority}`);
+                } catch (error) {
+                  console.log(`⚠️ Failed to add label ${checkedPriority}`);
+                }
+              }
+            } else {
+              console.log('⚠️ Priority가 선택되지 않았습니다.');
+            }
+            
+            // ========================================
+            // 3. PR 제목 자동 업데이트 (opened 시에만)
+            // ========================================
+            if (context.payload.action === 'opened' && checkedType) {
+              const currentTitle = pr.title;
+            
+              // 이미 [type-숫자] 형식이 있는지 확인
+              const hasPrefix = /^\[.+-\d+\]/.test(currentTitle);
+            
+              if (!hasPrefix) {
+                // 해당 type의 가장 최근 PR 번호 찾기
+                const { data: allPRs } = await github.rest.pulls.list({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'all',
+                  per_page: 100
+                });
+            
+                // 해당 type의 PR들만 필터링
+                const typePRs = allPRs.filter(p => {
+                  const match = p.title.match(/^\[(\w+)-(\d+)\]/);
+                  return match && match[1] === checkedType;
+                });
+            
+                // 가장 큰 번호 찾기
+                let maxNumber = 0;
+                typePRs.forEach(p => {
+                  const match = p.title.match(/^\[(\w+)-(\d+)\]/);
+                  if (match) {
+                    const num = parseInt(match[2]);
+                    if (num > maxNumber) maxNumber = num;
+                  }
+                });
+            
+                const newNumber = maxNumber + 1;
+                const newTitle = `[${checkedType}-${newNumber}] ${currentTitle}`;
+            
+                try {
+                  await github.rest.pulls.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: prNumber,
+                    title: newTitle
+                  });
+                  console.log(`✅ Updated PR title: ${newTitle}`);
+                } catch (error) {
+                  console.log(`⚠️ Failed to update PR title: ${error.message}`);
+                }
+              }
+            }
+            
+            // ========================================
+            // 4. PR이 merged되면 연결된 Issue에 성공 코멘트 추가
+            // ========================================
+            if (context.payload.action === 'closed' && pr.merged) {
+              console.log('✓ PR이 merged되었습니다.');
+            
+              // "Closes #숫자" 패턴 찾기
+              const closesPattern = /(?:Closes|closes|Close|close|Fixed|fixed|Fix|fix|Resolved|resolved|Resolve|resolve)\s+#(\d+)/g;
+              const matches = [...body.matchAll(closesPattern)];
+            
+              if (matches.length > 0) {
+                for (const match of matches) {
+                  const issueNumber = parseInt(match[1]);
+            
+                  try {
+                    // Issue가 실제로 close되었는지 확인
+                    const { data: issue } = await github.rest.issues.get({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issueNumber
+                    });
+            
+                    if (issue.state === 'closed') {
+                      // 성공 코멘트 추가
+                      await github.rest.issues.createComment({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: issueNumber,
+                        body: `✅ 이 이슈는 PR #${prNumber} 에 의해 성공적으로 해결되었습니다!\n\n🎉 작업이 완료되어 배포되었습니다.`
+                      });
+                      console.log(`✅ Added success comment to issue #${issueNumber}`);
+                    }
+                  } catch (error) {
+                    console.log(`⚠️ Failed to process issue #${issueNumber}: ${error.message}`);
+                  }
+                }
+              } else {
+                console.log('⚠️ "Closes #숫자" 패턴을 찾을 수 없습니다.');
+              }
+            }
