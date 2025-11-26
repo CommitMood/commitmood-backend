@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: commitmood-batch
+
+github:
+  api:
+    base-url: https://api.github.com
+  scheduler:
+    cron: "0 0 0 * * *"
