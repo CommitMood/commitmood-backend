@@ -1,0 +1,65 @@
+name: Issue Priority Label
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+jobs:
+  label-priority:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Priority and Add Label
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+            const currentLabels = context.payload.issue.labels.map(l => l.name);
+            
+            // Priority 라벨 목록
+            const priorityLabels = ['P0', 'P1', 'P2', 'P3'];
+            
+            // 체크된 Priority 찾기
+            let checkedPriority = null;
+            
+            if (body.includes('- [x] P0') || body.includes('- [X] P0')) {
+              checkedPriority = 'P0';
+            } else if (body.includes('- [x] P1') || body.includes('- [X] P1')) {
+              checkedPriority = 'P1';
+            } else if (body.includes('- [x] P2') || body.includes('- [X] P2')) {
+              checkedPriority = 'P2';
+            } else if (body.includes('- [x] P3') || body.includes('- [X] P3')) {
+              checkedPriority = 'P3';
+            }
+            
+            if (!checkedPriority) {
+              console.log('⚠️ Priority가 선택되지 않았습니다.');
+              return;
+            }
+            
+            // 기존 Priority 라벨 제거
+            const labelsToRemove = currentLabels.filter(label => 
+              priorityLabels.includes(label) && label !== checkedPriority
+            );
+            
+            for (const label of labelsToRemove) {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                name: label
+              });
+              console.log(`🗑️ Removed label: ${label}`);
+            }
+            
+            // 새로운 Priority 라벨 추가
+            if (!currentLabels.includes(checkedPriority)) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                labels: [checkedPriority]
+              });
+              console.log(`✅ Added label: ${checkedPriority}`);
+            } else {
+              console.log(`✓ Label already exists: ${checkedPriority}`);
+            }
