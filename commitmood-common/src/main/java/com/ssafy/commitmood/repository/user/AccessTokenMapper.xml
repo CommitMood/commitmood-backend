@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.commitmood.mapper.user.AccessTokenMapper">
+
+    <resultMap id="AccessTokenResultMap" type="com.commitmood.domain.user.AccessToken">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="accessToken" column="access_token"/>
+        <result property="tokenType" column="token_type"/>
+        <result property="scope" column="scope"/>
+        <result property="expiresAt" column="expires_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.commitmood.domain.user.AccessToken"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO access_token (
+            user_id,
+            access_token,
+            token_type,
+            scope,
+            expires_at
+        ) VALUES (
+                     #{userId},
+                     #{accessToken},
+                     #{tokenType},
+                     #{scope},
+                     #{expiresAt}
+                 )
+    </insert>
+
+    <select id="findById" resultMap="AccessTokenResultMap">
+        SELECT *
+        FROM access_token
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByAccessToken" resultMap="AccessTokenResultMap">
+        SELECT *
+        FROM access_token
+        WHERE access_token = #{accessToken}
+    </select>
+
+    <select id="findByUserId" resultMap="AccessTokenResultMap">
+        SELECT *
+        FROM access_token
+        WHERE user_id = #{userId}
+    </select>
+
+    <update id="update" parameterType="com.commitmood.domain.user.AccessToken">
+        UPDATE access_token
+        SET access_token = #{accessToken},
+            token_type = #{tokenType},
+            scope = #{scope},
+            expires_at = #{expiresAt}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM access_token
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByUserId">
+        DELETE FROM access_token
+        WHERE user_id = #{userId}
+    </delete>
+
+</mapper>

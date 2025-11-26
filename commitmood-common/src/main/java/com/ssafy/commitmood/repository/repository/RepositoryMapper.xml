@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.commitmood.mapper.repository.RepositoryMapper">
+
+    <resultMap id="RepositoryResultMap" type="com.commitmood.domain.repository.Repository">
+        <id property="id" column="id"/>
+        <result property="ownerId" column="owner_id"/>
+        <result property="githubRepoId" column="github_repo_id"/>
+        <result property="name" column="name"/>
+        <result property="fullName" column="full_name"/>
+        <result property="defaultBranch" column="default_branch"/>
+        <result property="description" column="description"/>
+        <result property="htmlUrl" column="html_url"/>
+        <result property="isPrivate" column="is_private"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="lastSyncedAt" column="last_synced_at"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.commitmood.domain.repository.Repository"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO repository (
+            owner_id,
+            github_repo_id,
+            name,
+            full_name,
+            default_branch,
+            description,
+            html_url,
+            is_private,
+            last_synced_at
+        ) VALUES (
+                     #{ownerId},
+                     #{githubRepoId},
+                     #{name},
+                     #{fullName},
+                     #{defaultBranch},
+                     #{description},
+                     #{htmlUrl},
+                     #{isPrivate},
+                     #{lastSyncedAt}
+                 )
+    </insert>
+
+    <select id="findById" resultMap="RepositoryResultMap">
+        SELECT *
+        FROM repository
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByGithubRepoId" resultMap="RepositoryResultMap">
+        SELECT *
+        FROM repository
+        WHERE github_repo_id = #{githubRepoId}
+    </select>
+
+    <select id="findByOwnerId" resultMap="RepositoryResultMap">
+        SELECT *
+        FROM repository
+        WHERE owner_id = #{ownerId}
+        ORDER BY last_synced_at DESC
+    </select>
+
+    <select id="findAll" resultMap="RepositoryResultMap">
+        SELECT *
+        FROM repository
+        ORDER BY created_at DESC
+    </select>
+
+    <update id="update" parameterType="com.commitmood.domain.repository.Repository">
+        UPDATE repository
+        SET name = #{name},
+            full_name = #{fullName},
+            default_branch = #{defaultBranch},
+            description = #{description},
+            html_url = #{htmlUrl},
+            is_private = #{isPrivate},
+            last_synced_at = #{lastSyncedAt}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM repository
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByOwnerId">
+        DELETE FROM repository
+        WHERE owner_id = #{ownerId}
+    </delete>
+
+</mapper>
