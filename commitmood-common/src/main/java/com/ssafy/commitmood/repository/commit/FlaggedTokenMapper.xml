@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.commitmood.mapper.analysis.FlaggedTokenMapper">
+
+    <resultMap id="FlaggedTokenResultMap" type="com.commitmood.domain.analysis.FlaggedToken">
+        <id property="id" column="id"/>
+        <result property="commitId" column="commit_id"/>
+        <result property="token" column="token"/>
+        <result property="tokenType" column="token_type"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="weight" column="weight"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.commitmood.domain.analysis.FlaggedToken"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO flagged_token (
+            commit_id,
+            token,
+            token_type,
+            weight
+        ) VALUES (
+                     #{commitId},
+                     #{token},
+                     #{tokenType, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+                     #{weight}
+                 )
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO flagged_token (
+        commit_id,
+        token,
+        token_type,
+        weight
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.commitId},
+            #{item.token},
+            #{item.tokenType, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+            #{item.weight}
+            )
+        </foreach>
+    </insert>
+
+    <select id="findById" resultMap="FlaggedTokenResultMap">
+        SELECT *
+        FROM flagged_token
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByCommitId" resultMap="FlaggedTokenResultMap">
+        SELECT *
+        FROM flagged_token
+        WHERE commit_id = #{commitId}
+        ORDER BY weight DESC, token
+    </select>
+
+    <select id="findByCommitIds" resultMap="FlaggedTokenResultMap">
+        SELECT *
+        FROM flagged_token
+        WHERE commit_id IN
+        <foreach collection="commitIds" item="commitId" open="(" separator="," close=")">
+            #{commitId}
+        </foreach>
+        ORDER BY commit_id, weight DESC, token
+    </select>
+
+    <update id="update" parameterType="com.commitmood.domain.analysis.FlaggedToken">
+        UPDATE flagged_token
+        SET token = #{token},
+            token_type = #{tokenType, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+            weight = #{weight}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM flagged_token
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByCommitId">
+        DELETE FROM flagged_token
+        WHERE commit_id = #{commitId}
+    </delete>
+
+</mapper>
