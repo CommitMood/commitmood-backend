@@ -17,19 +17,16 @@
 
     <insert id="insert" parameterType="com.commitmood.domain.user.AccessToken"
             useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO access_token (
-            user_id,
-            access_token,
-            token_type,
-            scope,
-            expires_at
-        ) VALUES (
-                     #{userId},
-                     #{accessToken},
-                     #{tokenType},
-                     #{scope},
-                     #{expiresAt}
-                 )
+        INSERT INTO access_token (user_id,
+                                  access_token,
+                                  token_type,
+                                  scope,
+                                  expires_at)
+        VALUES (#{userId},
+                #{accessToken},
+                #{tokenType},
+                #{scope},
+                #{expiresAt})
     </insert>
 
     <select id="findById" resultMap="AccessTokenResultMap">

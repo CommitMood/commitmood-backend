@@ -21,27 +21,24 @@
 
     <insert id="insert" parameterType="com.commitmood.domain.repository.Repository"
             useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO repository (
-            owner_id,
-            github_repo_id,
-            name,
-            full_name,
-            default_branch,
-            description,
-            html_url,
-            is_private,
-            last_synced_at
-        ) VALUES (
-                     #{ownerId},
-                     #{githubRepoId},
-                     #{name},
-                     #{fullName},
-                     #{defaultBranch},
-                     #{description},
-                     #{htmlUrl},
-                     #{isPrivate},
-                     #{lastSyncedAt}
-                 )
+        INSERT INTO repository (owner_id,
+                                github_repo_id,
+                                name,
+                                full_name,
+                                default_branch,
+                                description,
+                                html_url,
+                                is_private,
+                                last_synced_at)
+        VALUES (#{ownerId},
+                #{githubRepoId},
+                #{name},
+                #{fullName},
+                #{defaultBranch},
+                #{description},
+                #{htmlUrl},
+                #{isPrivate},
+                #{lastSyncedAt})
     </insert>
 
     <select id="findById" resultMap="RepositoryResultMap">

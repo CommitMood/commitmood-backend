@@ -20,25 +20,22 @@
 
     <insert id="insert" parameterType="com.commitmood.domain.commit.CommitFileChange"
             useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO commit_file_change (
-            commit_id,
-            filename,
-            status,
-            additions,
-            deletions,
-            changes,
-            patch,
-            previous_filename
-        ) VALUES (
-                     #{commitId},
-                     #{filename},
-                     #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-                     #{additions},
-                     #{deletions},
-                     #{changes},
-                     #{patch},
-                     #{previousFilename}
-                 )
+        INSERT INTO commit_file_change (commit_id,
+                                        filename,
+                                        status,
+                                        additions,
+                                        deletions,
+                                        changes,
+                                        patch,
+                                        previous_filename)
+        VALUES (#{commitId},
+                #{filename},
+                #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+                #{additions},
+                #{deletions},
+                #{changes},
+                #{patch},
+                #{previousFilename})
     </insert>
 
     <insert id="insertBatch" parameterType="java.util.List">
