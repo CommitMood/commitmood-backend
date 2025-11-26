@@ -3,7 +3,7 @@ package com.ssafy.commitmood.repository.user;
 
 import com.ssafy.commitmood.domain.UserAccount;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.data.repository.query.Param;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Optional;
 
