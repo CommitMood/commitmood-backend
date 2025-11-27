@@ -28,13 +28,6 @@ public class GithubCommitDto {
     }
 
     @Data
-    public static class AuthorInfoDto {
-        private String name;
-        private String email;
-        private LocalDateTime date;  // committed_at
-    }
-
-    @Data
     public static class AuthorDto {
         private Long id;  // author_id
         private String login;
@@ -44,9 +37,17 @@ public class GithubCommitDto {
     }
 
     @Data
+    public static class AuthorInfoDto {
+        private String name;
+        private String email;
+        private LocalDateTime date;  // committed_at
+    }
+
+    @Data
     public static class StatsDto {
         private Integer additions;
         private Integer deletions;
+        private Integer filesChanged;
         private Integer total;  // total_changes
     }
 }
