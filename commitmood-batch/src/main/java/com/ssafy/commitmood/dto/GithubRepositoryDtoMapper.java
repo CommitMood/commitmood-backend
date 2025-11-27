@@ -51,7 +51,7 @@ public class GithubRepositoryDtoMapper {
      * @param ownerId 검증할 ownerId
      * @return 일치(true), 불일치(false)
      */
-    public boolean validateOwner(GithubRepositoryDto dto, Long ownerId) {
+    public boolean validate(GithubRepositoryDto dto, Long ownerId) {
         if (dto == null || dto.getOwner() == null) {
             log.warn("GithubRepositoryDto is null, cannot validate owner.");
             return false;
