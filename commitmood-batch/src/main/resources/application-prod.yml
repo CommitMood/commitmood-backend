@@ -4,6 +4,7 @@ spring:
   sql:
     init:
       mode: never
+      platform: mysql
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
