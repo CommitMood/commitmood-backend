@@ -1,6 +1,9 @@
 spring:
   profiles:
     include: batch-secret
+  sql:
+    init:
+      mode: never
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -12,3 +15,8 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
     jdbc-type-for-null: NULL
+
+logging:
+  level:
+    com.commitmood: INFO
+    org.springframework: WARN
