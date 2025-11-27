@@ -29,6 +29,15 @@ public class GithubReaderScheduler {
         List<GithubCommitDto> result = reader.callGithubRepoToCommit("swkim12345", "algo_practice", 1, 1);
 
         for (var dto : result) {
+            var sha = dto.getSha();
+            var commitStatsDto = reader.callGithubRepoToCommitStats("swkim12345","algo_practice", sha, 1, 1);
+            GithubCommitDto.StatsDto statsDto = new  GithubCommitDto.StatsDto();
+            statsDto.setAdditions(commitStatsDto.getStats().getAdditions());
+            statsDto.setDeletions(commitStatsDto.getStats().getDeletions());
+            statsDto.setTotal(commitStatsDto.getStats().getTotal());
+            statsDto.setFilesChanged(commitStatsDto.getFiles().size());
+            dto.setStats(statsDto);
+
             log.warn("result : {}", dto);
         }
     }

@@ -2,6 +2,7 @@ package com.ssafy.commitmood.reader;
 
 import com.ssafy.commitmood.config.GithubRestClientConfig;
 import com.ssafy.commitmood.dto.GithubCommitDto;
+import com.ssafy.commitmood.dto.GithubCommitStatsDto;
 import com.ssafy.commitmood.dto.GithubRepositoryDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,5 +43,16 @@ public class GithubReader {
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {
                 });
+    }
+
+    public GithubCommitStatsDto callGithubRepoToCommitStats(String username, String repo, String ref, int page, int perPage) {
+        return config.restClient().get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/repos/{username}/{repo}/commits/{ref}")
+                        .queryParam("page", page)
+                        .queryParam("per_page", perPage)
+                        .build(username, repo, ref))
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {});
     }
 }
