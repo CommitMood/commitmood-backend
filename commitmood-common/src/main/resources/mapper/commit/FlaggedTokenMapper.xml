@@ -16,17 +16,14 @@
 
     <insert id="insert" parameterType="com.commitmood.domain.analysis.FlaggedToken"
             useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO flagged_token (
-            commit_id,
-            token,
-            token_type,
-            weight
-        ) VALUES (
-                     #{commitId},
-                     #{token},
-                     #{tokenType, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-                     #{weight}
-                 )
+        INSERT INTO flagged_token (commit_id,
+                                   token,
+                                   token_type,
+                                   weight)
+        VALUES (#{commitId},
+                #{token},
+                #{tokenType, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+                #{weight})
     </insert>
 
     <insert id="insertBatch" parameterType="java.util.List">
@@ -71,19 +68,21 @@
 
     <update id="update" parameterType="com.commitmood.domain.analysis.FlaggedToken">
         UPDATE flagged_token
-        SET token = #{token},
+        SET token      = #{token},
             token_type = #{tokenType, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-            weight = #{weight}
+            weight     = #{weight}
         WHERE id = #{id}
     </update>
 
     <delete id="deleteById">
-        DELETE FROM flagged_token
+        DELETE
+        FROM flagged_token
         WHERE id = #{id}
     </delete>
 
     <delete id="deleteByCommitId">
-        DELETE FROM flagged_token
+        DELETE
+        FROM flagged_token
         WHERE commit_id = #{commitId}
     </delete>
 

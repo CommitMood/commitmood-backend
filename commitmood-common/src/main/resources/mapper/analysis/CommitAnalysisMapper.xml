@@ -19,25 +19,22 @@
 
     <insert id="insert" parameterType="com.commitmood.domain.analysis.CommitAnalysis"
             useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO commit_analysis (
-            commit_id,
-            flagged_count,
-            swear_count,
-            exclaim_count,
-            emoji_count,
-            sentiment,
-            sentiment_score,
-            analyzed_at
-        ) VALUES (
-                     #{commitId},
-                     #{flaggedCount},
-                     #{swearCount},
-                     #{exclaimCount},
-                     #{emojiCount},
-                     #{sentiment, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-                     #{sentimentScore},
-                     #{analyzedAt}
-                 )
+        INSERT INTO commit_analysis (commit_id,
+                                     flagged_count,
+                                     swear_count,
+                                     exclaim_count,
+                                     emoji_count,
+                                     sentiment,
+                                     sentiment_score,
+                                     analyzed_at)
+        VALUES (#{commitId},
+                #{flaggedCount},
+                #{swearCount},
+                #{exclaimCount},
+                #{emojiCount},
+                #{sentiment, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+                #{sentimentScore},
+                #{analyzedAt})
     </insert>
 
     <select id="findById" resultMap="CommitAnalysisResultMap">

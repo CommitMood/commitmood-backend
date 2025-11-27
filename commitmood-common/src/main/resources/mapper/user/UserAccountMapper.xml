@@ -17,19 +17,16 @@
 
     <insert id="insert" parameterType="com.commitmood.domain.user.UserAccount"
             useGeneratedKeys="true" keyProperty="userId" keyColumn="user_id">
-        INSERT INTO user_account (
-            github_id,
-            github_login,
-            github_email,
-            github_avatar_url,
-            github_name
-        ) VALUES (
-                     #{githubId},
-                     #{githubLogin},
-                     #{githubEmail},
-                     #{githubAvatarUrl},
-                     #{githubName}
-                 )
+        INSERT INTO user_account (github_id,
+                                  github_login,
+                                  github_email,
+                                  github_avatar_url,
+                                  github_name)
+        VALUES (#{githubId},
+                #{githubLogin},
+                #{githubEmail},
+                #{githubAvatarUrl},
+                #{githubName})
     </insert>
 
     <select id="findById" resultMap="UserAccountResultMap">
