@@ -2,100 +2,131 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.commitmood.mapper.commit.CommitFileChangeMapper">
+<mapper namespace="com.ssafy.commitmood.domain.common.mapper.CommitFileChangeMapper">
 
-    <resultMap id="CommitFileChangeResultMap" type="com.commitmood.domain.commit.CommitFileChange">
-        <id property="id" column="id"/>
-        <result property="commitId" column="commit_id"/>
-        <result property="filename" column="filename"/>
-        <result property="status" column="status"
-                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
-        <result property="additions" column="additions"/>
-        <result property="deletions" column="deletions"/>
-        <result property="changes" column="changes"/>
-        <result property="patch" column="patch"/>
-        <result property="previousFilename" column="previous_filename"/>
-        <result property="createdAt" column="created_at"/>
+    <resultMap id="commitFileChangeResultMap" type="com.ssafy.commitmood.domain.common.entity.CommitFileChange">
+        <id property="id" column="ID"/>
+        <result property="commitLogId" column="COMMIT_LOG_ID"/>
+        <result property="filename" column="FILENAME"/>
+        <result property="prevFilename" column="PREV_FILENAME"/>
+        <result property="status" column="STATUS" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="additions" column="ADDITIONS"/>
+        <result property="deletions" column="DELETIONS"/>
+        <result property="changes" column="CHANGES"/>
+        <result property="patch" column="PATCH"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
     </resultMap>
 
-    <insert id="insert" parameterType="com.commitmood.domain.commit.CommitFileChange"
-            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO commit_file_change (commit_id,
-                                        filename,
-                                        status,
-                                        additions,
-                                        deletions,
-                                        changes,
-                                        patch,
-                                        previous_filename)
-        VALUES (#{commitId},
-                #{filename},
-                #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-                #{additions},
-                #{deletions},
-                #{changes},
-                #{patch},
-                #{previousFilename})
+    <!-- INSERT -->
+    <insert id="insert" parameterType="com.ssafy.commitmood.domain.common.entity.CommitFileChange"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+        INSERT INTO COMMIT_FILE_CHANGE (
+            COMMIT_LOG_ID,
+            FILENAME,
+            PREV_FILENAME,
+            STATUS,
+            ADDITIONS,
+            DELETIONS,
+            CHANGES,
+            PATCH,
+            CREATED_AT,
+            UPDATED_AT
+        ) VALUES (
+                     #{commitLogId},
+                     #{filename},
+                     #{prevFilename},
+                     #{status},
+                     #{additions},
+                     #{deletions},
+                     #{changes},
+                     #{patch},
+                     CURRENT_TIMESTAMP,
+                     CURRENT_TIMESTAMP
+                 )
     </insert>
 
+    <!-- INSERT BATCH -->
     <insert id="insertBatch" parameterType="java.util.List">
-        INSERT INTO commit_file_change (
-        commit_id,
-        filename,
-        status,
-        additions,
-        deletions,
-        changes,
-        patch,
-        previous_filename
+        INSERT INTO COMMIT_FILE_CHANGE (
+        COMMIT_LOG_ID,
+        FILENAME,
+        PREV_FILENAME,
+        STATUS,
+        ADDITIONS,
+        DELETIONS,
+        CHANGES,
+        PATCH,
+        CREATED_AT,
+        UPDATED_AT
         ) VALUES
-        <foreach collection="list" item="item" separator=",">
+        <foreach collection="fileChanges" item="item" separator=",">
             (
-            #{item.commitId},
+            #{item.commitLogId},
             #{item.filename},
-            #{item.status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+            #{item.prevFilename},
+            #{item.status},
             #{item.additions},
             #{item.deletions},
             #{item.changes},
             #{item.patch},
-            #{item.previousFilename}
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP
             )
         </foreach>
     </insert>
 
-    <select id="findById" resultMap="CommitFileChangeResultMap">
-        SELECT *
-        FROM commit_file_change
-        WHERE id = #{id}
-    </select>
-
-    <select id="findByCommitId" resultMap="CommitFileChangeResultMap">
-        SELECT *
-        FROM commit_file_change
-        WHERE commit_id = #{commitId}
-        ORDER BY filename
-    </select>
-
-    <update id="update" parameterType="com.commitmood.domain.commit.CommitFileChange">
-        UPDATE commit_file_change
-        SET filename = #{filename},
-            status = #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-            additions = #{additions},
-            deletions = #{deletions},
-            changes = #{changes},
-            patch = #{patch},
-            previous_filename = #{previousFilename}
-        WHERE id = #{id}
+    <!-- UPDATE -->
+    <update id="update" parameterType="com.ssafy.commitmood.domain.common.entity.CommitFileChange">
+        UPDATE COMMIT_FILE_CHANGE
+        SET ADDITIONS = #{additions},
+            DELETIONS = #{deletions},
+            CHANGES = #{changes},
+            PATCH = #{patch},
+            UPDATED_AT = CURRENT_TIMESTAMP
+        WHERE ID = #{id}
     </update>
 
+    <!-- SELECT BY ID -->
+    <select id="findById" resultMap="commitFileChangeResultMap">
+        SELECT *
+        FROM COMMIT_FILE_CHANGE
+        WHERE ID = #{id}
+    </select>
+
+    <!-- SELECT ALL BY COMMIT_LOG_ID -->
+    <select id="findAllByCommitLogId" resultMap="commitFileChangeResultMap">
+        SELECT *
+        FROM COMMIT_FILE_CHANGE
+        WHERE COMMIT_LOG_ID = #{commitLogId}
+        ORDER BY FILENAME
+    </select>
+
+    <!-- SELECT BY COMMIT_LOG_ID AND FILENAME -->
+    <select id="findByCommitLogIdAndFilename" resultMap="commitFileChangeResultMap">
+        SELECT *
+        FROM COMMIT_FILE_CHANGE
+        WHERE COMMIT_LOG_ID = #{commitLogId}
+          AND FILENAME = #{filename}
+    </select>
+
+    <!-- DELETE BY ID -->
     <delete id="deleteById">
-        DELETE FROM commit_file_change
-        WHERE id = #{id}
+        DELETE FROM COMMIT_FILE_CHANGE
+        WHERE ID = #{id}
     </delete>
 
-    <delete id="deleteByCommitId">
-        DELETE FROM commit_file_change
-        WHERE commit_id = #{commitId}
+    <!-- DELETE ALL BY COMMIT_LOG_ID -->
+    <delete id="deleteAllByCommitLogId">
+        DELETE FROM COMMIT_FILE_CHANGE
+        WHERE COMMIT_LOG_ID = #{commitLogId}
     </delete>
+
+    <!-- COUNT BY COMMIT_LOG_ID -->
+    <select id="countByCommitLogId" resultType="int">
+        SELECT COUNT(*)
+        FROM COMMIT_FILE_CHANGE
+        WHERE COMMIT_LOG_ID = #{commitLogId}
+    </select>
 
 </mapper>

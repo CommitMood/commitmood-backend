@@ -2,90 +2,153 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.commitmood.mapper.repository.RepositoryMapper">
+<mapper namespace="com.ssafy.commitmood.domain.common.mapper.CommitLogMapper">
 
-    <resultMap id="RepositoryResultMap" type="com.commitmood.domain.repository.Repository">
-        <id property="id" column="id"/>
-        <result property="ownerId" column="owner_id"/>
-        <result property="githubRepoId" column="github_repo_id"/>
-        <result property="name" column="name"/>
-        <result property="fullName" column="full_name"/>
-        <result property="defaultBranch" column="default_branch"/>
-        <result property="description" column="description"/>
-        <result property="htmlUrl" column="html_url"/>
-        <result property="isPrivate" column="is_private"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
-        <result property="lastSyncedAt" column="last_synced_at"/>
+    <resultMap id="commitLogResultMap" type="com.ssafy.commitmood.domain.common.entity.CommitLog">
+        <id property="id" column="ID"/>
+        <result property="githubRepoId" column="GITHUB_REPO_ID"/>
+        <result property="userAccountId" column="USER_ACCOUNT_ID"/>
+        <result property="githubCommitSha" column="GITHUB_COMMIT_SHA"/>
+        <result property="committedAt" column="COMMITTED_AT"/>
+        <result property="message" column="MESSAGE"/>
+        <result property="htmlUrl" column="HTML_URL"/>
+        <result property="additions" column="ADDITIONS"/>
+        <result property="deletions" column="DELETIONS"/>
+        <result property="totalChanges" column="TOTAL_CHANGES"/>
+        <result property="filesChanged" column="FILES_CHANGED"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
     </resultMap>
 
-    <insert id="insert" parameterType="com.commitmood.domain.repository.Repository"
-            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO repository (owner_id,
-                                github_repo_id,
-                                name,
-                                full_name,
-                                default_branch,
-                                description,
-                                html_url,
-                                is_private,
-                                last_synced_at)
-        VALUES (#{ownerId},
-                #{githubRepoId},
-                #{name},
-                #{fullName},
-                #{defaultBranch},
-                #{description},
-                #{htmlUrl},
-                #{isPrivate},
-                #{lastSyncedAt})
+    <!-- INSERT -->
+    <insert id="insert" parameterType="com.ssafy.commitmood.domain.common.entity.CommitLog"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+        INSERT INTO COMMIT_LOG (
+            GITHUB_REPO_ID,
+            USER_ACCOUNT_ID,
+            GITHUB_COMMIT_SHA,
+            COMMITTED_AT,
+            MESSAGE,
+            HTML_URL,
+            ADDITIONS,
+            DELETIONS,
+            TOTAL_CHANGES,
+            FILES_CHANGED,
+            CREATED_AT,
+            UPDATED_AT
+        ) VALUES (
+                     #{githubRepoId},
+                     #{userAccountId},
+                     #{githubCommitSha},
+                     #{committedAt},
+                     #{message},
+                     #{htmlUrl},
+                     #{additions},
+                     #{deletions},
+                     #{totalChanges},
+                     #{filesChanged},
+                     CURRENT_TIMESTAMP,
+                     CURRENT_TIMESTAMP
+                 )
     </insert>
 
-    <select id="findById" resultMap="RepositoryResultMap">
-        SELECT *
-        FROM repository
-        WHERE id = #{id}
-    </select>
-
-    <select id="findByGithubRepoId" resultMap="RepositoryResultMap">
-        SELECT *
-        FROM repository
-        WHERE github_repo_id = #{githubRepoId}
-    </select>
-
-    <select id="findByOwnerId" resultMap="RepositoryResultMap">
-        SELECT *
-        FROM repository
-        WHERE owner_id = #{ownerId}
-        ORDER BY last_synced_at DESC
-    </select>
-
-    <select id="findAll" resultMap="RepositoryResultMap">
-        SELECT *
-        FROM repository
-        ORDER BY created_at DESC
-    </select>
-
-    <update id="update" parameterType="com.commitmood.domain.repository.Repository">
-        UPDATE repository
-        SET name = #{name},
-            full_name = #{fullName},
-            default_branch = #{defaultBranch},
-            description = #{description},
-            html_url = #{htmlUrl},
-            is_private = #{isPrivate},
-            last_synced_at = #{lastSyncedAt}
-        WHERE id = #{id}
+    <!-- UPDATE -->
+    <update id="update" parameterType="com.ssafy.commitmood.domain.common.entity.CommitLog">
+        UPDATE COMMIT_LOG
+        SET MESSAGE = #{message},
+            ADDITIONS = #{additions},
+            DELETIONS = #{deletions},
+            TOTAL_CHANGES = #{totalChanges},
+            FILES_CHANGED = #{filesChanged},
+            UPDATED_AT = CURRENT_TIMESTAMP
+        WHERE ID = #{id}
     </update>
 
+    <!-- SELECT BY ID -->
+    <select id="findById" resultMap="commitLogResultMap">
+        SELECT *
+        FROM COMMIT_LOG
+        WHERE ID = #{id}
+    </select>
+
+    <!-- SELECT BY REPO_ID AND SHA -->
+    <select id="findByRepoIdAndSha" resultMap="commitLogResultMap">
+        SELECT *
+        FROM COMMIT_LOG
+        WHERE GITHUB_REPO_ID = #{githubRepoId}
+          AND GITHUB_COMMIT_SHA = #{githubCommitSha}
+    </select>
+
+    <!-- SELECT ALL BY GITHUB_REPO_ID -->
+    <select id="findAllByGithubRepoId" resultMap="commitLogResultMap">
+        SELECT *
+        FROM COMMIT_LOG
+        WHERE GITHUB_REPO_ID = #{githubRepoId}
+        ORDER BY COMMITTED_AT DESC
+    </select>
+
+    <!-- SELECT ALL BY USER_ACCOUNT_ID -->
+    <select id="findAllByUserAccountId" resultMap="commitLogResultMap">
+        SELECT *
+        FROM COMMIT_LOG
+        WHERE USER_ACCOUNT_ID = #{userAccountId}
+        ORDER BY COMMITTED_AT DESC
+    </select>
+
+    <!-- SELECT ALL BY USER_ACCOUNT_ID AND DATE RANGE -->
+    <select id="findAllByUserAccountIdAndDateRange" resultMap="commitLogResultMap">
+        SELECT *
+        FROM COMMIT_LOG
+        WHERE USER_ACCOUNT_ID = #{userAccountId}
+        <if test="startDate != null">
+            AND COMMITTED_AT &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND COMMITTED_AT &lt;= #{endDate}
+        </if>
+        ORDER BY COMMITTED_AT DESC
+    </select>
+
+    <!-- SELECT ALL BY GITHUB_REPO_ID AND DATE RANGE -->
+    <select id="findAllByGithubRepoIdAndDateRange" resultMap="commitLogResultMap">
+        SELECT *
+        FROM COMMIT_LOG
+        WHERE GITHUB_REPO_ID = #{githubRepoId}
+        <if test="startDate != null">
+            AND COMMITTED_AT &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND COMMITTED_AT &lt;= #{endDate}
+        </if>
+        ORDER BY COMMITTED_AT DESC
+    </select>
+
+    <!-- DELETE BY ID -->
     <delete id="deleteById">
-        DELETE FROM repository
-        WHERE id = #{id}
+        DELETE FROM COMMIT_LOG
+        WHERE ID = #{id}
     </delete>
 
-    <delete id="deleteByOwnerId">
-        DELETE FROM repository
-        WHERE owner_id = #{ownerId}
-    </delete>
+    <!-- EXISTS BY REPO_ID AND SHA -->
+    <select id="existsByRepoIdAndSha" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM COMMIT_LOG
+        WHERE GITHUB_REPO_ID = #{githubRepoId}
+          AND GITHUB_COMMIT_SHA = #{githubCommitSha}
+    </select>
+
+    <!-- COUNT BY USER_ACCOUNT_ID -->
+    <select id="countByUserAccountId" resultType="int">
+        SELECT COUNT(*)
+        FROM COMMIT_LOG
+        WHERE USER_ACCOUNT_ID = #{userAccountId}
+    </select>
+
+    <!-- COUNT BY GITHUB_REPO_ID -->
+    <select id="countByGithubRepoId" resultType="int">
+        SELECT COUNT(*)
+        FROM COMMIT_LOG
+        WHERE GITHUB_REPO_ID = #{githubRepoId}
+    </select>
 
 </mapper>
