@@ -2,88 +2,119 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.commitmood.mapper.analysis.FlaggedTokenMapper">
+<mapper namespace="com.ssafy.commitmood.domain.common.mapper.FlaggedTokenMapper">
 
-    <resultMap id="FlaggedTokenResultMap" type="com.commitmood.domain.analysis.FlaggedToken">
-        <id property="id" column="id"/>
-        <result property="commitId" column="commit_id"/>
-        <result property="token" column="token"/>
-        <result property="tokenType" column="token_type"
-                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
-        <result property="weight" column="weight"/>
-        <result property="createdAt" column="created_at"/>
+    <resultMap id="flaggedTokenResultMap" type="com.ssafy.commitmood.domain.common.entity.FlaggedToken">
+        <id property="id" column="ID"/>
+        <result property="commitLogId" column="COMMIT_LOG_ID"/>
+        <result property="token" column="TOKEN"/>
+        <result property="tokenType" column="TOKEN_TYPE" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="weight" column="WEIGHT"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
     </resultMap>
 
-    <insert id="insert" parameterType="com.commitmood.domain.analysis.FlaggedToken"
-            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO flagged_token (commit_id,
-                                   token,
-                                   token_type,
-                                   weight)
-        VALUES (#{commitId},
-                #{token},
-                #{tokenType, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-                #{weight})
+    <!-- INSERT -->
+    <insert id="insert" parameterType="com.ssafy.commitmood.domain.common.entity.FlaggedToken"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+        INSERT INTO FLAGGED_TOKEN (
+            COMMIT_LOG_ID,
+            TOKEN,
+            TOKEN_TYPE,
+            WEIGHT,
+            CREATED_AT,
+            UPDATED_AT
+        ) VALUES (
+                     #{commitLogId},
+                     #{token},
+                     #{tokenType},
+                     #{weight},
+                     CURRENT_TIMESTAMP,
+                     CURRENT_TIMESTAMP
+                 )
     </insert>
 
+    <!-- INSERT BATCH -->
     <insert id="insertBatch" parameterType="java.util.List">
-        INSERT INTO flagged_token (
-        commit_id,
-        token,
-        token_type,
-        weight
+        INSERT INTO FLAGGED_TOKEN (
+        COMMIT_LOG_ID,
+        TOKEN,
+        TOKEN_TYPE,
+        WEIGHT,
+        CREATED_AT,
+        UPDATED_AT
         ) VALUES
-        <foreach collection="list" item="item" separator=",">
+        <foreach collection="flaggedTokens" item="item" separator=",">
             (
-            #{item.commitId},
+            #{item.commitLogId},
             #{item.token},
-            #{item.tokenType, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-            #{item.weight}
+            #{item.tokenType},
+            #{item.weight},
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP
             )
         </foreach>
     </insert>
 
-    <select id="findById" resultMap="FlaggedTokenResultMap">
-        SELECT *
-        FROM flagged_token
-        WHERE id = #{id}
-    </select>
-
-    <select id="findByCommitId" resultMap="FlaggedTokenResultMap">
-        SELECT *
-        FROM flagged_token
-        WHERE commit_id = #{commitId}
-        ORDER BY weight DESC, token
-    </select>
-
-    <select id="findByCommitIds" resultMap="FlaggedTokenResultMap">
-        SELECT *
-        FROM flagged_token
-        WHERE commit_id IN
-        <foreach collection="commitIds" item="commitId" open="(" separator="," close=")">
-            #{commitId}
-        </foreach>
-        ORDER BY commit_id, weight DESC, token
-    </select>
-
-    <update id="update" parameterType="com.commitmood.domain.analysis.FlaggedToken">
-        UPDATE flagged_token
-        SET token      = #{token},
-            token_type = #{tokenType, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
-            weight     = #{weight}
-        WHERE id = #{id}
+    <!-- UPDATE -->
+    <update id="update" parameterType="com.ssafy.commitmood.domain.common.entity.FlaggedToken">
+        UPDATE FLAGGED_TOKEN
+        SET TOKEN_TYPE = #{tokenType},
+            WEIGHT = #{weight},
+            UPDATED_AT = CURRENT_TIMESTAMP
+        WHERE ID = #{id}
     </update>
 
+    <!-- SELECT BY ID -->
+    <select id="findById" resultMap="flaggedTokenResultMap">
+        SELECT *
+        FROM FLAGGED_TOKEN
+        WHERE ID = #{id}
+    </select>
+
+    <!-- SELECT ALL BY COMMIT_LOG_ID -->
+    <select id="findAllByCommitLogId" resultMap="flaggedTokenResultMap">
+        SELECT *
+        FROM FLAGGED_TOKEN
+        WHERE COMMIT_LOG_ID = #{commitLogId}
+        ORDER BY WEIGHT DESC, TOKEN
+    </select>
+
+    <!-- SELECT ALL BY COMMIT_LOG_ID AND TOKEN_TYPE -->
+    <select id="findAllByCommitLogIdAndTokenType" resultMap="flaggedTokenResultMap">
+        SELECT *
+        FROM FLAGGED_TOKEN
+        WHERE COMMIT_LOG_ID = #{commitLogId}
+          AND TOKEN_TYPE = #{tokenType}
+        ORDER BY WEIGHT DESC, TOKEN
+    </select>
+
+    <!-- SELECT BY COMMIT_LOG_ID AND TOKEN AND TOKEN_TYPE -->
+    <select id="findByCommitLogIdAndTokenAndType" resultMap="flaggedTokenResultMap">
+        SELECT *
+        FROM FLAGGED_TOKEN
+        WHERE COMMIT_LOG_ID = #{commitLogId}
+          AND TOKEN = #{token}
+          AND TOKEN_TYPE = #{tokenType}
+    </select>
+
+    <!-- DELETE BY ID -->
     <delete id="deleteById">
-        DELETE
-        FROM flagged_token
-        WHERE id = #{id}
+        DELETE FROM FLAGGED_TOKEN
+        WHERE ID = #{id}
     </delete>
 
-    <delete id="deleteByCommitId">
-        DELETE
-        FROM flagged_token
-        WHERE commit_id = #{commitId}
+    <!-- DELETE ALL BY COMMIT_LOG_ID -->
+    <delete id="deleteAllByCommitLogId">
+        DELETE FROM FLAGGED_TOKEN
+        WHERE COMMIT_LOG_ID = #{commitLogId}
     </delete>
+
+    <!-- COUNT BY COMMIT_LOG_ID -->
+    <select id="countByCommitLogId" resultType="int">
+        SELECT COUNT(*)
+        FROM FLAGGED_TOKEN
+        WHERE COMMIT_LOG_ID = #{commitLogId}
+    </select>
 
 </mapper>
