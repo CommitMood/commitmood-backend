@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-@EqualsAndHashCode(of = {"githubRepoId", "githubCommitSha"})
+@EqualsAndHashCode(of = {"githubRepoId", "githubCommitSha"}, callSuper = false)
 public class CommitLog extends BaseTimeEntity {
 
     private Long id;

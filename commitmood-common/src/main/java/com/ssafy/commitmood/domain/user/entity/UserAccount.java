@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-@EqualsAndHashCode(of = "githubUserId")
+@EqualsAndHashCode(of = "githubUserId", callSuper = false)
 public class UserAccount extends BaseTimeEntity {
 
     private Long id;

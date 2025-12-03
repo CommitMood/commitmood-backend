@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-@EqualsAndHashCode(of = {"commitLogId", "token", "tokenType"})
+@EqualsAndHashCode(of = {"commitLogId", "token", "tokenType"}, callSuper = false)
 public class FlaggedToken extends BaseTimeEntity {
 
     private Long id;

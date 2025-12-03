@@ -8,10 +8,11 @@ import com.ssafy.commitmood.domain.common.entity.BaseTimeEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = false)
 public class AccessToken extends BaseTimeEntity {
 
     private Long id;

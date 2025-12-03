@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-@EqualsAndHashCode(of = "commitLogId")
+@EqualsAndHashCode(of = "commitLogId", callSuper = false)
 public class CommitAnalysis extends BaseTimeEntity {
 
     private Long id;
