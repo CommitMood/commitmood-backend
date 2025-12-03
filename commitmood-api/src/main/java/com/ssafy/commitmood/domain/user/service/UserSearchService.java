@@ -1,6 +1,6 @@
 package com.ssafy.commitmood.domain.user.service;
 
-import com.ssafy.commitmood.domain.common.dto.response.PageResponse;
+import com.ssafy.commitmood.common.dto.response.PageResponse;
 import com.ssafy.commitmood.domain.user.dto.response.UserSearchResponse;
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
 import com.ssafy.commitmood.domain.user.repository.UserAccountRepository;

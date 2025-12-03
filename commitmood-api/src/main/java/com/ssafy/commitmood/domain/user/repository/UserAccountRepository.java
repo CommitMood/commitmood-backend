@@ -51,6 +51,10 @@ public class UserAccountRepository {
         mapper.updateLastSyncedAt(id, lastSyncedAt);
     }
 
+    public void deleteById(Long id) {
+        mapper.deleteById(id);
+    }
+
     public long countByLogin(String keyword) {
         return mapper.countByLogin(keyword);
     }
