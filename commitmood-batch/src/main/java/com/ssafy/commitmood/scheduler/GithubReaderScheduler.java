@@ -1,6 +1,6 @@
 package com.ssafy.commitmood.scheduler;
 import com.ssafy.commitmood.dto.GithubCommitDto;
-import com.ssafy.commitmood.dto.GithubRepositoryDto;
+import com.ssafy.commitmood.dto.GithubRepoDto;
 import com.ssafy.commitmood.reader.GithubReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ public class GithubReaderScheduler {
 
 //    @Scheduled(cron = "* * * * * *")
     public void runUserToRepo() {
-        List<GithubRepositoryDto> result = reader.callGithubUserToRepo("swkim12345", 1, 1);
+        List<GithubRepoDto> result = reader.callGithubUserToRepo("swkim12345", 1, 1);
 
         for (var dto : result) {
             log.warn("result : {}", dto);
@@ -35,7 +35,7 @@ public class GithubReaderScheduler {
             statsDto.setAdditions(commitStatsDto.getStats().getAdditions());
             statsDto.setDeletions(commitStatsDto.getStats().getDeletions());
             statsDto.setTotal(commitStatsDto.getStats().getTotal());
-            statsDto.setFilesChanged(commitStatsDto.getFiles().size());
+            statsDto.setFilesChanged((long) commitStatsDto.getFiles().size());
             dto.setStats(statsDto);
 
             log.warn("result : {}", dto);
