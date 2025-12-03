@@ -34,7 +34,7 @@
                      #{githubEmail},
                      #{githubAvatarUrl},
                      #{githubName},
-                     #{lastSyncedAt},
+                     CURRENT_TIMESTAMP,
                      CURRENT_TIMESTAMP,
                      CURRENT_TIMESTAMP
                  )
