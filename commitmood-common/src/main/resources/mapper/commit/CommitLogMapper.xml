@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.ssafy.commitmood.domain.common.mapper.CommitLogMapper">
+<mapper namespace="com.ssafy.commitmood.domain.commit.mapper.CommitLogMapper">
 
-    <resultMap id="commitLogResultMap" type="com.ssafy.commitmood.domain.common.entity.CommitLog">
+    <resultMap id="commitLogResultMap" type="com.ssafy.commitmood.domain.commit.entity.CommitLog">
         <id property="id" column="ID"/>
         <result property="githubRepoId" column="GITHUB_REPO_ID"/>
         <result property="userAccountId" column="USER_ACCOUNT_ID"/>
@@ -21,7 +21,7 @@
     </resultMap>
 
     <!-- INSERT -->
-    <insert id="insert" parameterType="com.ssafy.commitmood.domain.common.entity.CommitLog"
+    <insert id="insert" parameterType="com.ssafy.commitmood.domain.commit.entity.CommitLog"
             useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
         INSERT INTO COMMIT_LOG (
             GITHUB_REPO_ID,
@@ -53,7 +53,7 @@
     </insert>
 
     <!-- UPDATE -->
-    <update id="update" parameterType="com.ssafy.commitmood.domain.common.entity.CommitLog">
+    <update id="update" parameterType="com.ssafy.commitmood.domain.commit.entity.CommitLog">
         UPDATE COMMIT_LOG
         SET MESSAGE = #{message},
             ADDITIONS = #{additions},

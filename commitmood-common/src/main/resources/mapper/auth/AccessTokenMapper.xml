@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.ssafy.commitmood.domain.common.mapper.AccessTokenMapper">
+<mapper namespace="com.ssafy.commitmood.domain.auth.mapper.AccessTokenMapper">
 
-    <resultMap id="accessTokenResultMap" type="com.ssafy.commitmood.domain.common.entity.AccessToken">
+    <resultMap id="accessTokenResultMap" type="com.ssafy.commitmood.domain.auth.entity.AccessToken">
         <id property="id" column="ID"/>
         <result property="userAccountId" column="USER_ACCOUNT_ID"/>
         <result property="accessToken" column="ACCESS_TOKEN"/>
@@ -16,7 +16,7 @@
     </resultMap>
 
     <!-- INSERT -->
-    <insert id="insert" parameterType="com.ssafy.commitmood.domain.common.entity.AccessToken"
+    <insert id="insert" parameterType="com.ssafy.commitmood.domain.auth.entity.AccessToken"
             useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
         INSERT INTO ACCESS_TOKEN (
             USER_ACCOUNT_ID,
@@ -38,7 +38,7 @@
     </insert>
 
     <!-- UPDATE -->
-    <update id="update" parameterType="com.ssafy.commitmood.domain.common.entity.AccessToken">
+    <update id="update" parameterType="com.ssafy.commitmood.domain.auth.entity.AccessToken">
         UPDATE ACCESS_TOKEN
         SET ACCESS_TOKEN = #{accessToken},
             SCOPE = #{scope},

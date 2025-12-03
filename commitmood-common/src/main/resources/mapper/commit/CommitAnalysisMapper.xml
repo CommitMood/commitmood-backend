@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.ssafy.commitmood.domain.common.mapper.CommitAnalysisMapper">
+<mapper namespace="com.ssafy.commitmood.domain.commit.mapper.CommitAnalysisMapper">
 
-    <resultMap id="commitAnalysisResultMap" type="com.ssafy.commitmood.domain.common.entity.CommitAnalysis">
+    <resultMap id="commitAnalysisResultMap" type="com.ssafy.commitmood.domain.commit.entity.CommitAnalysis">
         <id property="id" column="ID"/>
         <result property="commitLogId" column="COMMIT_LOG_ID"/>
         <result property="flaggedCount" column="FLAGGED_COUNT"/>
@@ -19,7 +19,7 @@
     </resultMap>
 
     <!-- INSERT -->
-    <insert id="insert" parameterType="com.ssafy.commitmood.domain.common.entity.CommitAnalysis"
+    <insert id="insert" parameterType="com.ssafy.commitmood.domain.commit.entity.CommitAnalysis"
             useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
         INSERT INTO COMMIT_ANALYSIS (
             COMMIT_LOG_ID,
@@ -47,7 +47,7 @@
     </insert>
 
     <!-- UPDATE -->
-    <update id="update" parameterType="com.ssafy.commitmood.domain.common.entity.CommitAnalysis">
+    <update id="update" parameterType="com.ssafy.commitmood.domain.commit.entity.CommitAnalysis">
         UPDATE COMMIT_ANALYSIS
         SET FLAGGED_COUNT = #{flaggedCount},
             SWEAR_COUNT = #{swearCount},

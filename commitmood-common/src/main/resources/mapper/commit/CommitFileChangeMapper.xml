@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.ssafy.commitmood.domain.common.mapper.CommitFileChangeMapper">
+<mapper namespace="com.ssafy.commitmood.domain.commit.mapper.CommitFileChangeMapper">
 
-    <resultMap id="commitFileChangeResultMap" type="com.ssafy.commitmood.domain.common.entity.CommitFileChange">
+    <resultMap id="commitFileChangeResultMap" type="com.ssafy.commitmood.domain.commit.entity.CommitFileChange">
         <id property="id" column="ID"/>
         <result property="commitLogId" column="COMMIT_LOG_ID"/>
         <result property="filename" column="FILENAME"/>
@@ -19,7 +19,7 @@
     </resultMap>
 
     <!-- INSERT -->
-    <insert id="insert" parameterType="com.ssafy.commitmood.domain.common.entity.CommitFileChange"
+    <insert id="insert" parameterType="com.ssafy.commitmood.domain.commit.entity.CommitFileChange"
             useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
         INSERT INTO COMMIT_FILE_CHANGE (
             COMMIT_LOG_ID,
@@ -77,7 +77,7 @@
     </insert>
 
     <!-- UPDATE -->
-    <update id="update" parameterType="com.ssafy.commitmood.domain.common.entity.CommitFileChange">
+    <update id="update" parameterType="com.ssafy.commitmood.domain.commit.entity.CommitFileChange">
         UPDATE COMMIT_FILE_CHANGE
         SET ADDITIONS = #{additions},
             DELETIONS = #{deletions},
