@@ -3,6 +3,10 @@ spring:
     name: commitmood-batch
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:local}
+  batch:
+    job:
+      name: githubSyncJob
+      enabled: false
 
 #  datasource:
 #    driver-class-name: com.mysql.cj.jdbc.Driver
