@@ -1,4 +1,4 @@
-package com.ssafy.commitmood.api;
+package com.ssafy.commitmood;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
