@@ -13,7 +13,6 @@ public class GithubRepoDtoMapper {
             return null;
         }
 
-        Long userAccountId = dto.getOwner().getId();
         Long githubRepoId = dto.getId();
         String githubRepoName = dto.getName();
         String githubRepoFullName = dto.getFullName();
@@ -22,7 +21,7 @@ public class GithubRepoDtoMapper {
         String githubRepoUrl = dto.getHtmlUrl();
         Boolean isPrivate = dto.isPrivate();
 
-        return GithubRepo.create(userAccountId, githubRepoId, githubRepoName, githubRepoFullName, defaultBranch, description, githubRepoUrl, isPrivate);
+        return GithubRepo.create(ownerId, githubRepoId, githubRepoName, githubRepoFullName, defaultBranch, description, githubRepoUrl, isPrivate);
     }
 
     /**
