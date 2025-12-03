@@ -50,4 +50,8 @@ public class UserAccountRepository {
     public void updateLastSyncedAt(Long id, LocalDateTime lastSyncedAt) {
         mapper.updateLastSyncedAt(id, lastSyncedAt);
     }
+
+    public long countByLogin(String keyword) {
+        return mapper.countByLogin(keyword);
+    }
 }

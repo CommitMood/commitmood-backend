@@ -34,4 +34,6 @@ public interface UserAccountMapper {
     );
 
     void deleteById(@Param("id") Long id);
+
+    long countByLogin(String keyword);
 }

@@ -95,4 +95,10 @@
         WHERE id = #{id}
     </delete>
 
+    <!-- Paging -->
+    <select id="countByLogin" resultType="long">
+        SELECT COUNT(*)
+        FROM user_account
+        WHERE github_login LIKE CONCAT('%', #{keyword}, '%')
+    </select>
 </mapper>
