@@ -21,7 +21,7 @@ class UserAccountMapperTest {
 
     @Test
     @DisplayName("INSERT + SELECT 테스트")
-    void insert_and_find() {
+    void insertAndFind() {
         // given
         UserAccount user = UserAccount.create(
                 10L,
@@ -42,7 +42,7 @@ class UserAccountMapperTest {
 
     @Test
     @DisplayName("LIKE 검색 테스트")
-    void search_by_login() {
+    void searchByLogin() {
         // given
         UserAccount user = UserAccount.create(
                 11L,
@@ -63,7 +63,7 @@ class UserAccountMapperTest {
 
     @Test
     @DisplayName("updateProfile 테스트")
-    void update_profile() {
+    void updateProfile() {
         // given
         UserAccount user = UserAccount.create(
                 12L,
@@ -87,7 +87,7 @@ class UserAccountMapperTest {
 
     @Test
     @DisplayName("lastSyncedAt 업데이트 테스트")
-    void update_last_synced_at() {
+    void updateLastSyncedAt() {
         // given
         UserAccount user = UserAccount.create(
                 13L,
