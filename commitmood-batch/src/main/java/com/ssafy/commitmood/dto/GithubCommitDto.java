@@ -18,6 +18,11 @@ public class GithubCommitDto {
 
     private StatsDto stats;  // additions, deletions 정보
 
+    // Reader에서 설정할 필드
+    private Long githubRepoId;
+
+    private Long dbRepoId;
+
     @Data
     public static class CommitDetailDto {
         private AuthorInfoDto author;  // 커밋 작성자 정보
