@@ -63,7 +63,7 @@
         ORDER BY github_login ASC
     </select>
 
-    <select id="searchByLoginPaged" resultType="UserAccountResultMap">
+    <select id="searchByLoginPaged" resultMap="UserAccountResultMap">
         SELECT *
         FROM user_account
         WHERE github_login LIKE CONCAT('%', #{query}, '%')
