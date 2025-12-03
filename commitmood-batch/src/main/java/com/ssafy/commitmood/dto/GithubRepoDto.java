@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class GithubRepositoryDto {
+public class GithubRepoDto {
     private Long id;  // github_repo_id로 매핑될 것
 
     private String name;
@@ -28,6 +28,9 @@ public class GithubRepositoryDto {
 
     @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
+
+    @JsonProperty("description")
+    private String description;
 
     private OwnerDto owner;
 
