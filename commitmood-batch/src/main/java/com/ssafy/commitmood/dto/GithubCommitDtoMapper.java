@@ -1,8 +1,10 @@
 package com.ssafy.commitmood.dto;
 
-import com.ssafy.commitmood.domain.CommitLog;
+import com.ssafy.commitmood.domain.commit.entity.CommitLog;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @Component
@@ -14,33 +16,17 @@ public class GithubCommitDtoMapper {
             return null;
         }
 
-        return CommitLog.builder()
-                .repoId(repoId)
-                .authorId(authorId)
-                .githubCommitSha(dto.getSha())
-                .committedAt(dto.getCommit().getAuthor().getDate())
-                .message(dto.getCommit().getMessage())
-                .htmlUrl(dto.getHtmlUrl())
-                .additions(dto.getStats().getAdditions())
-                .deletions(dto.getStats().getDeletions())
-                .totalChanges(dto.getStats().getTotal())
-                .filesChanged(dto.getStats().getFilesChanged())
-                .build();
-    }
+        String githubCommitSha = dto.getSha();
+        LocalDateTime committedAt = dto.getCommit().getAuthor().getDate();
+        String message = dto.getCommit().getMessage();
+        String htmlUrl = dto.getHtmlUrl();
+        Long additions = dto.getStats().getAdditions();
+        Long deletions = dto.getStats().getDeletions();
+        Long totalChanges = dto.getStats().getTotal();
+        Long filesChanged = dto.getStats().getFilesChanged();
 
-    public void updateEntity(CommitLog existing, GithubCommitDto dto, Long repoId, Long authorId) {
-        if (existing == null || dto == null) {
-            log.warn("Cannot update: existing={}, dto={}", existing, dto);
-            return;
-        }
-
-        existing.setCommittedAt(dto.getCommit().getAuthor().getDate());
-        existing.setMessage(dto.getCommit().getMessage());
-        existing.setHtmlUrl(dto.getHtmlUrl());
-        existing.setAdditions(dto.getStats().getAdditions());
-        existing.setDeletions(dto.getStats().getDeletions());
-        existing.setTotalChanges(dto.getStats().getTotal());
-        existing.setFilesChanged(dto.getStats().getFilesChanged());
+        return CommitLog.create(repoId, authorId, githubCommitSha, committedAt
+        ,message,htmlUrl,additions,deletions,totalChanges,filesChanged);
     }
 
     /**
