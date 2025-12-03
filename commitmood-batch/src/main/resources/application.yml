@@ -4,27 +4,27 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:local}
 
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/commitmood?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:password}
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
-
-  sql:
-    init:
-      mode: always                    # always: 항상 실행, never: 실행 안 함, embedded: 임베디드 DB만
-      platform: mysql                 # mysql, h2, postgresql 등
-      schema-locations: classpath:schema-${spring.sql.init.platform}.sql
-      data-locations: classpath:data-${spring.sql.init.platform}.sql
-      encoding: utf-8
-      continue-on-error: false        # 에러 발생 시 중단
-      separator: ;                    # SQL 구문 구분자
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/commitmood?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul
+#    username: ${DB_USERNAME:root}
+#    password: ${DB_PASSWORD:password}
+#    hikari:
+#      maximum-pool-size: 10
+#      minimum-idle: 5
+#      connection-timeout: 30000
+#      idle-timeout: 600000
+#      max-lifetime: 1800000
+#
+#  sql:
+#    init:
+#      mode: always                    # always: 항상 실행, never: 실행 안 함, embedded: 임베디드 DB만
+#      platform: mysql                 # mysql, h2, postgresql 등
+#      schema-locations: classpath:schema-${spring.sql.init.platform}.sql
+#      data-locations: classpath:data-${spring.sql.init.platform}.sql
+#      encoding: utf-8
+#      continue-on-error: false        # 에러 발생 시 중단
+#      separator: ;                    # SQL 구문 구분자
 
 
 github:
@@ -32,8 +32,6 @@ github:
     base-url: https://api.github.com
   scheduler:
     cron: "0 0 0 * * *"
-
-
 
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
