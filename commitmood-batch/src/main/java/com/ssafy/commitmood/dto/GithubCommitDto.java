@@ -45,9 +45,9 @@ public class GithubCommitDto {
 
     @Data
     public static class StatsDto {
-        private Integer additions;
-        private Integer deletions;
-        private Integer filesChanged;
-        private Integer total;  // total_changes
+        private Long additions;
+        private Long deletions;
+        private Long filesChanged;
+        private Long total;  // total_changes
     }
 }

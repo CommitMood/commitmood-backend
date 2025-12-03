@@ -13,9 +13,9 @@ public class GithubCommitStatsDto {
 
     @Data
     public static class StatsDto {
-        private Integer additions;
-        private Integer deletions;
-        private Integer total;  // additions + deletions
+        private Long additions;
+        private Long deletions;
+        private Long total;  // additions + deletions
     }
 
     @Data
@@ -23,9 +23,9 @@ public class GithubCommitStatsDto {
         private String sha;
         private String filename;
         private String status;
-        private Integer additions;
-        private Integer deletions;
-        private Integer changes;
+        private Long additions;
+        private Long deletions;
+        private Long changes;
 
         @JsonProperty("blob_url")
         private String blobUrl;
