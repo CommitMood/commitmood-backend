@@ -1,4 +1,4 @@
-package com.ssafy.commitmood.domain.common.dto.response;
+package com.ssafy.commitmood.common.dto.response;
 
 import java.util.List;
 
