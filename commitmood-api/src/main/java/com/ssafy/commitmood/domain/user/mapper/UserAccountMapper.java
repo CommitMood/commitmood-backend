@@ -20,6 +20,12 @@ public interface UserAccountMapper {
 
     List<UserAccount> searchByLogin(@Param("query") String query);
 
+    List<UserAccount> searchByLoginPaged(
+            @Param("keyword") String keyword,
+            @Param("pageSize") int pageSize,
+            @Param("offset") int offset
+    );
+
     void update(UserAccount userAccount);
 
     void updateLastSyncedAt(

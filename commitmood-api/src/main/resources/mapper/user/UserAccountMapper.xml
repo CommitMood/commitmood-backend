@@ -63,6 +63,15 @@
         ORDER BY github_login ASC
     </select>
 
+    <select id="searchByLoginPaged" resultType="UserAccountResultMap">
+        SELECT *
+        FROM user_account
+        WHERE github_login LIKE CONCAT('%', #{query}, '%')
+        ORDER BY github_login ASC
+        LIMIT #{pageSize}
+        OFFSET #{offset}
+    </select>
+
     <!-- Update all fields (profile change) -->
     <update id="update" parameterType="com.ssafy.commitmood.domain.user.entity.UserAccount">
         UPDATE user_account

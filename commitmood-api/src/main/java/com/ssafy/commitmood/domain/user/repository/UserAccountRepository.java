@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -32,6 +33,14 @@ public class UserAccountRepository {
 
     public List<UserAccount> searchByLogin(String query) {
         return mapper.searchByLogin(query);
+    }
+
+    public List<UserAccount> searchByLoginPaged(
+            @Param("keyword") String keyword,
+            @Param("pageSize") int pageSize,
+            @Param("offset") int offset
+    ) {
+        return mapper.searchByLoginPaged(keyword, pageSize, offset);
     }
 
     public void update(UserAccount userAccount) {
