@@ -121,4 +121,32 @@ class UserAccountRepositoryTest {
         // then
         assertThat(updated.getLastSyncedAt()).isEqualTo(now);
     }
+
+    @Test
+    @DisplayName("countByLogin: 키워드 기반 사용자 총 개수 조회 테스트")
+    void countByLogin_shouldReturnCorrectCount() {
+        // given
+        UserAccount u1 = UserAccount.create(101L, "devys", "a@test.com", null, "A");
+        UserAccount u2 = UserAccount.create(102L, "devy", "b@test.com", null, "B");
+        UserAccount u3 = UserAccount.create(103L, "developer", "c@test.com", null, "C");
+        UserAccount u4 = UserAccount.create(104L, "test-user", "t@test.com", null, "T");
+
+        repository.save(u1);
+        repository.save(u2);
+        repository.save(u3);
+        repository.save(u4);
+
+        // when
+        long result = repository.countByLogin("dev");
+
+        // then
+        assertThat(result).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("countByLogin: 검색 결과가 없는 경우 0 반환")
+    void countByLogin_noMatch_shouldReturnZero() {
+        long result = repository.countByLogin("zzzz");
+        assertThat(result).isZero();
+    }
 }

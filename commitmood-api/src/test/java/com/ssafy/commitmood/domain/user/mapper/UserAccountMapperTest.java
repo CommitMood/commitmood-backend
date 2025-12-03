@@ -107,4 +107,24 @@ class UserAccountMapperTest {
         var found = mapper.findById(user.getId()).orElseThrow();
         assertThat(found.getLastSyncedAt()).isEqualTo(now);
     }
+
+    @Test
+    void countByLogin_returnsZero_whenNoMatch() {
+        long count = mapper.countByLogin("zzz");
+        assertThat(count).isEqualTo(0L);
+    }
+
+    @Test
+    void countByLogin_returnsCorrectCount_whenPartialMatch() {
+        // given
+        mapper.insert(UserAccount.create(101L, "devys", "a@test.com", null, "A"));
+        mapper.insert(UserAccount.create(102L, "devy", "b@test.com", null, "B"));
+        mapper.insert(UserAccount.create(103L, "developer", "c@test.com", null, "C"));
+
+        // when
+        long count = mapper.countByLogin("dev");
+
+        // then
+        assertThat(count).isEqualTo(3L);
+    }
 }
