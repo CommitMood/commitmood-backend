@@ -44,7 +44,7 @@ dependencies {
     }
 
     /* 필요 시 OAuth2 (GitHub Token 관리용) */
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+//    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
     /* MyBatis */
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
