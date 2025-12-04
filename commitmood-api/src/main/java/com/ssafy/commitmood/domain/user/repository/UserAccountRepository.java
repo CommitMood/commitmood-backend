@@ -31,8 +31,8 @@ public class UserAccountRepository {
         return mapper.findByGithubLogin(githubLogin);
     }
 
-    public List<UserAccount> searchByLogin(String query) {
-        return mapper.searchByLogin(query);
+    public List<UserAccount> searchByLoginLike(String query) {
+        return mapper.searchByLoginLike(query);
     }
 
     public List<UserAccount> searchByLoginPaged(

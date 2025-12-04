@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
@@ -42,7 +43,7 @@ class UserAccountMapperTest {
 
     @Test
     @DisplayName("LIKE 검색 테스트")
-    void searchByLogin() {
+    void searchByLoginLike() {
         // given
         UserAccount user = UserAccount.create(
                 11L,
@@ -54,7 +55,7 @@ class UserAccountMapperTest {
         mapper.insert(user);
 
         // when
-        var result = mapper.searchByLogin("hello");
+        List<UserAccount> result = mapper.searchByLoginLike("hello");
 
         // then
         assertThat(result).hasSize(1);

@@ -18,7 +18,7 @@ public interface UserAccountMapper {
 
     Optional<UserAccount> findByGithubLogin(@Param("githubLogin") String githubLogin);
 
-    List<UserAccount> searchByLogin(@Param("query") String query);
+    List<UserAccount> searchByLoginLike(@Param("query") String query);
 
     List<UserAccount> searchByLoginPaged(
             @Param("keyword") String keyword,

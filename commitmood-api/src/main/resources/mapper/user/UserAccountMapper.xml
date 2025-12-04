@@ -56,7 +56,7 @@
     </select>
 
     <!-- Search by Login (LIKE 검색) -->
-    <select id="searchByLogin" resultMap="UserAccountResultMap">
+    <select id="searchByLoginLike" resultMap="UserAccountResultMap">
         SELECT *
         FROM user_account
         WHERE github_login LIKE CONCAT('%', #{query}, '%')
