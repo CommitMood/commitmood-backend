@@ -1,61 +1,29 @@
 package com.ssafy.commitmood.domain.user.repository;
 
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
-import com.ssafy.commitmood.domain.user.mapper.UserAccountMapper;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
 
-@Repository
-@RequiredArgsConstructor
-public class UserAccountRepository {
+public interface UserAccountRepository {
 
-    private final UserAccountMapper mapper;
+    void save(UserAccount userAccount);
 
-    public void save(UserAccount userAccount) {
-        mapper.insert(userAccount);
-    }
+    Optional<UserAccount> findById(Long id);
 
-    public Optional<UserAccount> findById(Long id) {
-        return mapper.findById(id);
-    }
+    Optional<UserAccount> findByGithubUserId(Long githubUserId);
 
-    public Optional<UserAccount> findByGithubUserId(Long githubUserId) {
-        return mapper.findByGithubUserId(githubUserId);
-    }
+    Optional<UserAccount> findByGithubLogin(String githubLogin);
 
-    public Optional<UserAccount> findByGithubLogin(String githubLogin) {
-        return mapper.findByGithubLogin(githubLogin);
-    }
+    List<UserAccount> searchByLoginLike(String query);
 
-    public List<UserAccount> searchByLoginLike(String query) {
-        return mapper.searchByLoginLike(query);
-    }
+    List<UserAccount> searchByLoginPaged(String keyword, int pageSize, int offset);
 
-    public List<UserAccount> searchByLoginPaged(
-            @Param("keyword") String keyword,
-            @Param("pageSize") int pageSize,
-            @Param("offset") int offset
-    ) {
-        return mapper.searchByLoginPaged(keyword, pageSize, offset);
-    }
+    void update(UserAccount userAccount);
 
-    public void update(UserAccount userAccount) {
-        mapper.update(userAccount);
-    }
+    void updateLastSyncedAt(Long id, LocalDateTime lastSyncedAt);
 
-    public void updateLastSyncedAt(Long id, LocalDateTime lastSyncedAt) {
-        mapper.updateLastSyncedAt(id, lastSyncedAt);
-    }
+    void deleteById(Long id);
 
-    public void deleteById(Long id) {
-        mapper.deleteById(id);
-    }
-
-    public long countByLogin(String keyword) {
-        return mapper.countByLogin(keyword);
-    }
+    long countByLogin(String keyword);
 }

@@ -17,7 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 @MybatisTest
 @ActiveProfiles("local")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(UserAccountRepository.class)
+@Import(UserAccountRepositoryImpl.class)
 class UserAccountRepositoryTest {
 
     @Autowired
