@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.commitmood.domain.user.mapper.UserAccountMapper">
+
+    <!-- Result Mapping -->
+    <resultMap id="UserAccountResultMap"
+               type="com.ssafy.commitmood.domain.user.entity.UserAccount">
+        <id property="id" column="id"/>
+        <result property="githubUserId" column="github_user_id"/>
+        <result property="githubLogin" column="github_login"/>
+        <result property="githubEmail" column="github_email"/>
+        <result property="githubAvatarUrl" column="github_avatar_url"/>
+        <result property="githubName" column="github_name"/>
+        <result property="lastSyncedAt" column="last_synced_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- Insert -->
+    <insert id="insert"
+            parameterType="com.ssafy.commitmood.domain.user.entity.UserAccount"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_account (github_user_id,
+                                  github_login,
+                                  github_email,
+                                  github_avatar_url,
+                                  github_name)
+        VALUES (#{githubUserId},
+                #{githubLogin},
+                #{githubEmail},
+                #{githubAvatarUrl},
+                #{githubName})
+    </insert>
+
+    <!-- Find by ID -->
+    <select id="findById" resultMap="UserAccountResultMap">
+        SELECT *
+        FROM user_account
+        WHERE id = #{id}
+    </select>
+
+    <!-- Find by GitHub User ID -->
+    <select id="findByGithubUserId" resultMap="UserAccountResultMap">
+        SELECT *
+        FROM user_account
+        WHERE github_user_id = #{githubUserId}
+    </select>
+
+    <!-- Find by GitHub Login -->
+    <select id="findByGithubLogin" resultMap="UserAccountResultMap">
+        SELECT *
+        FROM user_account
+        WHERE github_login = #{githubLogin}
+    </select>
+
+    <!-- Search by Login (LIKE 검색) -->
+    <select id="searchByLogin" resultMap="UserAccountResultMap">
+        SELECT *
+        FROM user_account
+        WHERE github_login LIKE CONCAT('%', #{query}, '%')
+        ORDER BY github_login ASC
+    </select>
+
+    <select id="searchByLoginPaged" resultMap="UserAccountResultMap">
+        SELECT *
+        FROM user_account
+        WHERE github_login LIKE CONCAT('%', #{query}, '%')
+        ORDER BY github_login ASC
+        LIMIT #{pageSize}
+        OFFSET #{offset}
+    </select>
+
+    <!-- Update all fields (profile change) -->
+    <update id="update" parameterType="com.ssafy.commitmood.domain.user.entity.UserAccount">
+        UPDATE user_account
+        SET github_email      = #{githubEmail},
+            github_avatar_url = #{githubAvatarUrl},
+            github_name       = #{githubName}
+        WHERE id = #{id}
+    </update>
+
+    <!-- Update lastSyncedAt -->
+    <update id="updateLastSyncedAt">
+        UPDATE user_account
+        SET last_synced_at = #{lastSyncedAt}
+        WHERE id = #{id}
+    </update>
+
+    <!-- Delete -->
+    <delete id="deleteById">
+        DELETE
+        FROM user_account
+        WHERE id = #{id}
+    </delete>
+
+    <!-- Paging -->
+    <select id="countByLogin" resultType="long">
+        SELECT COUNT(*)
+        FROM user_account
+        WHERE github_login LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+</mapper>

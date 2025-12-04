@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.commitmood.domain.user.mapper.UserAccountMapper">
+
+    <resultMap id="userAccountResultMap" type="com.ssafy.commitmood.domain.user.entity.UserAccount">
+        <id property="id" column="ID"/>
+        <result property="githubUserId" column="GITHUB_USER_ID"/>
+        <result property="githubLogin" column="GITHUB_LOGIN"/>
+        <result property="githubEmail" column="GITHUB_EMAIL"/>
+        <result property="githubAvatarUrl" column="GITHUB_AVATAR_URL"/>
+        <result property="githubName" column="GITHUB_NAME"/>
+        <result property="lastSyncedAt" column="LAST_SYNCED_AT"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
+    </resultMap>
+
+    <!-- INSERT -->
+    <insert id="insert" parameterType="com.ssafy.commitmood.domain.user.entity.UserAccount"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+        INSERT INTO USER_ACCOUNT (
+            GITHUB_USER_ID,
+            GITHUB_LOGIN,
+            GITHUB_EMAIL,
+            GITHUB_AVATAR_URL,
+            GITHUB_NAME,
+            LAST_SYNCED_AT,
+            CREATED_AT,
+            UPDATED_AT
+        ) VALUES (
+                     #{githubUserId},
+                     #{githubLogin},
+                     #{githubEmail},
+                     #{githubAvatarUrl},
+                     #{githubName},
+                     CURRENT_TIMESTAMP,
+                     CURRENT_TIMESTAMP,
+                     CURRENT_TIMESTAMP
+                 )
+    </insert>
+
+    <!-- UPDATE -->
+    <update id="update" parameterType="com.ssafy.commitmood.domain.user.entity.UserAccount">
+        UPDATE USER_ACCOUNT
+        SET GITHUB_EMAIL = #{githubEmail},
+            GITHUB_AVATAR_URL = #{githubAvatarUrl},
+            GITHUB_NAME = #{githubName},
+            LAST_SYNCED_AT = #{lastSyncedAt},
+            UPDATED_AT = CURRENT_TIMESTAMP
+        WHERE ID = #{id}
+    </update>
+
+    <!-- SELECT BY ID -->
+    <select id="findById" resultMap="userAccountResultMap">
+        SELECT *
+        FROM USER_ACCOUNT
+        WHERE ID = #{id}
+    </select>
+
+    <!-- SELECT BY GITHUB_USER_ID -->
+    <select id="findByGithubUserId" resultMap="userAccountResultMap">
+        SELECT *
+        FROM USER_ACCOUNT
+        WHERE GITHUB_USER_ID = #{githubUserId}
+    </select>
+
+    <!-- SELECT BY GITHUB_LOGIN -->
+    <select id="findByGithubLogin" resultMap="userAccountResultMap">
+        SELECT *
+        FROM USER_ACCOUNT
+        WHERE GITHUB_LOGIN = #{githubLogin}
+    </select>
+
+    <!-- SELECT ALL -->
+    <select id="findAll" resultMap="userAccountResultMap">
+        SELECT *
+        FROM USER_ACCOUNT
+        ORDER BY CREATED_AT DESC
+    </select>
+
+    <!-- DELETE BY ID -->
+    <delete id="deleteById">
+        DELETE FROM USER_ACCOUNT
+        WHERE ID = #{id}
+    </delete>
+
+    <!-- EXISTS BY GITHUB_USER_ID -->
+    <select id="existsByGithubUserId" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM USER_ACCOUNT
+        WHERE GITHUB_USER_ID = #{githubUserId}
+    </select>
+
+    <!-- EXISTS BY GITHUB_LOGIN -->
+    <select id="existsByGithubLogin" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM USER_ACCOUNT
+        WHERE GITHUB_LOGIN = #{githubLogin}
+    </select>
+
+</mapper>

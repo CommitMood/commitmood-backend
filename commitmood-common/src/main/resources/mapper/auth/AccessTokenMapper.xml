@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.commitmood.domain.auth.mapper.AccessTokenMapper">
+
+    <resultMap id="accessTokenResultMap" type="com.ssafy.commitmood.domain.auth.entity.AccessToken">
+        <id property="id" column="ID"/>
+        <result property="userAccountId" column="USER_ACCOUNT_ID"/>
+        <result property="accessToken" column="ACCESS_TOKEN"/>
+        <result property="tokenType" column="TOKEN_TYPE"/>
+        <result property="scope" column="SCOPE"/>
+        <result property="expiresAt" column="EXPIRES_AT"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
+    </resultMap>
+
+    <!-- INSERT -->
+    <insert id="insert" parameterType="com.ssafy.commitmood.domain.auth.entity.AccessToken"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+        INSERT INTO ACCESS_TOKEN (
+            USER_ACCOUNT_ID,
+            ACCESS_TOKEN,
+            TOKEN_TYPE,
+            SCOPE,
+            EXPIRES_AT,
+            CREATED_AT,
+            UPDATED_AT
+        ) VALUES (
+                     #{userAccountId},
+                     #{accessToken},
+                     #{tokenType},
+                     #{scope},
+                     #{expiresAt},
+                     CURRENT_TIMESTAMP,
+                     CURRENT_TIMESTAMP
+                 )
+    </insert>
+
+    <!-- UPDATE -->
+    <update id="update" parameterType="com.ssafy.commitmood.domain.auth.entity.AccessToken">
+        UPDATE ACCESS_TOKEN
+        SET ACCESS_TOKEN = #{accessToken},
+            SCOPE = #{scope},
+            EXPIRES_AT = #{expiresAt},
+            UPDATED_AT = CURRENT_TIMESTAMP
+        WHERE ID = #{id}
+    </update>
+
+    <!-- SELECT BY ID -->
+    <select id="findById" resultMap="accessTokenResultMap">
+        SELECT *
+        FROM ACCESS_TOKEN
+        WHERE ID = #{id}
+    </select>
+
+    <!-- SELECT BY USER_ACCOUNT_ID -->
+    <select id="findByUserAccountId" resultMap="accessTokenResultMap">
+        SELECT *
+        FROM ACCESS_TOKEN
+        WHERE USER_ACCOUNT_ID = #{userAccountId}
+        ORDER BY CREATED_AT DESC
+            LIMIT 1
+    </select>
+
+    <!-- SELECT BY ACCESS_TOKEN -->
+    <select id="findByAccessToken" resultMap="accessTokenResultMap">
+        SELECT *
+        FROM ACCESS_TOKEN
+        WHERE ACCESS_TOKEN = #{accessToken}
+    </select>
+
+    <!-- SELECT ALL BY USER_ACCOUNT_ID -->
+    <select id="findAllByUserAccountId" resultMap="accessTokenResultMap">
+        SELECT *
+        FROM ACCESS_TOKEN
+        WHERE USER_ACCOUNT_ID = #{userAccountId}
+        ORDER BY CREATED_AT DESC
+    </select>
+
+    <!-- DELETE BY ID -->
+    <delete id="deleteById">
+        DELETE FROM ACCESS_TOKEN
+        WHERE ID = #{id}
+    </delete>
+
+    <!-- DELETE BY USER_ACCOUNT_ID -->
+    <delete id="deleteByUserAccountId">
+        DELETE FROM ACCESS_TOKEN
+        WHERE USER_ACCOUNT_ID = #{userAccountId}
+    </delete>
+
+    <!-- EXISTS BY ACCESS_TOKEN -->
+    <select id="existsByAccessToken" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM ACCESS_TOKEN
+        WHERE ACCESS_TOKEN = #{accessToken}
+    </select>
+
+</mapper>

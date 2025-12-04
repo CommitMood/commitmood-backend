@@ -34,6 +34,15 @@ dependencies {
     /* GitHub API 호출 용 WebClient */
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+    /* macOS DNS resolver - 맥북 라인업을 위한 native 의존성 명시 */
+    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+        if (System.getProperty("os.arch") == "aarch64") {
+            implementation 'io.netty:netty-resolver-dns-native-macos:4.1.115.Final:osx-aarch_64'
+        } else {
+            implementation 'io.netty:netty-resolver-dns-native-macos:4.1.115.Final:osx-x86_64'
+        }
+    }
+
     /* 필요 시 OAuth2 (GitHub Token 관리용) */
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
