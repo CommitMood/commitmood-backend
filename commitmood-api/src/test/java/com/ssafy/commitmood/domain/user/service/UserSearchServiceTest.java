@@ -46,7 +46,7 @@ class UserSearchServiceTest {
     @DisplayName("keyword로 검색 시 UserSearchResponse 리스트 반환")
     void search_success() {
         // given
-        given(repository.searchByLogin("dev"))
+        given(repository.searchByLoginLike("dev"))
                 .willReturn(List.of(mockUser1, mockUser2));
 
         given(mockUser1.getGithubLogin()).willReturn("devys");

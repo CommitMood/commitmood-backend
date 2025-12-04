@@ -19,7 +19,7 @@ public class UserSearchService {
             return List.of();
         }
 
-        return repository.searchByLogin(keyword).stream()
+        return repository.searchByLoginLike(keyword).stream()
                 .map(UserSearchResponse::of)
                 .toList();
     }
