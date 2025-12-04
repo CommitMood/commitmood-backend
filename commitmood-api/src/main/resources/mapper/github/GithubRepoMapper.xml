@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.commitmood.domain.github.mapper.GithubRepoMapper">
+
+    <resultMap id="GithubRepoResultMap" type="com.ssafy.commitmood.domain.github.entity.GithubRepo">
+        <id property="id" column="id"/>
+        <result property="userAccountId" column="user_account_id"/>
+        <result property="githubRepoId" column="github_repo_id"/>
+        <result property="githubRepoName" column="github_repo_name"/>
+        <result property="githubRepoFullName" column="github_repo_full_name"/>
+        <result property="defaultBranch" column="default_branch"/>
+        <result property="description" column="description"/>
+        <result property="githubRepoUrl" column="github_repo_url"/>
+        <result property="isPrivate" column="is_private"/>
+        <result property="lastSyncedAt" column="last_synced_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+
+    <!-- INSERT -->
+    <insert id="insert" parameterType="com.ssafy.commitmood.domain.github.entity.GithubRepo"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO github_repo (user_account_id,
+                                 github_repo_id,
+                                 github_repo_name,
+                                 github_repo_full_name,
+                                 default_branch,
+                                 description,
+                                 github_repo_url,
+                                 is_private,
+                                 last_synced_at,
+                                 created_at,
+                                 updated_at)
+        VALUES (#{userAccountId},
+                #{githubRepoId},
+                #{githubRepoName},
+                #{githubRepoFullName},
+                #{defaultBranch},
+                #{description},
+                #{githubRepoUrl},
+                #{isPrivate},
+                #{lastSyncedAt},
+                NOW(),
+                NOW())
+    </insert>
+
+
+    <!-- 단건 조회 -->
+    <select id="findById" resultMap="GithubRepoResultMap">
+        SELECT *
+        FROM github_repo
+        WHERE id = #{repoId}
+    </select>
+
+
+    <!-- 특정 사용자 소유 repo 조회 -->
+    <select id="findByUserAccountId" resultMap="GithubRepoResultMap">
+        SELECT *
+        FROM github_repo
+        WHERE user_account_id = #{userAccountId}
+        ORDER BY id DESC
+    </select>
+
+
+    <!-- 검색 -->
+    <select id="searchByKeyword" resultMap="GithubRepoResultMap">
+        SELECT *
+        FROM github_repo
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (github_repo_name LIKE CONCAT('%', #{keyword}, '%')
+                OR github_repo_full_name LIKE CONCAT('%', #{keyword}, '%')
+                OR description LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="searchPaged" resultMap="GithubRepoResultMap">
+        SELECT *
+        FROM github_repo
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (github_repo_name LIKE CONCAT('%', #{keyword}, '%')
+                OR github_repo_full_name LIKE CONCAT('%', #{keyword}, '%')
+                OR description LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{pageSize}
+        OFFSET #{offset}
+    </select>
+
+    <!-- 전체 수정 -->
+    <update id="updateRepo" parameterType="com.ssafy.commitmood.domain.github.entity.GithubRepo">
+        UPDATE github_repo
+        SET github_repo_name = #{githubRepoName},
+            default_branch   = #{defaultBranch},
+            description      = #{description},
+            github_repo_url  = #{githubRepoUrl},
+            is_private       = #{isPrivate},
+            updated_at       = NOW()
+        WHERE id = #{id}
+    </update>
+
+
+    <!-- Sync 시간 업데이트 -->
+    <update id="updateLastSyncedAt">
+        UPDATE github_repo
+        SET last_synced_at = #{time},
+            updated_at     = NOW()
+        WHERE id = #{repoId}
+    </update>
+
+
+    <!-- 삭제 -->
+    <delete id="deleteById">
+        DELETE
+        FROM github_repo
+        WHERE id = #{repoId}
+    </delete>
+
+    <!-- Paging -->
+    <select id="countByKeyword" resultType="long">
+        SELECT COUNT(*)
+        FROM github_repo
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (github_repo_name LIKE CONCAT('%', #{keyword}, '%')
+                OR github_repo_full_name LIKE CONCAT('%', #{keyword}, '%')
+                OR description LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+</mapper>
