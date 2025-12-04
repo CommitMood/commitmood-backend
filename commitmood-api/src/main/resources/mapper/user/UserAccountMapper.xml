@@ -59,17 +59,28 @@
     <select id="searchByLoginLike" resultMap="UserAccountResultMap">
         SELECT *
         FROM user_account
-        WHERE github_login LIKE CONCAT('%', #{query}, '%')
+        <where>
+            <if test="query != null and query != ''">
+                (github_login LIKE CONCAT('%', #{query}, '%')
+                OR github_email LIKE CONCAT('%', #{query}, '%')
+                OR github_name LIKE CONCAT('%', #{query}, '%'))
+            </if>
+        </where>
         ORDER BY github_login ASC
     </select>
 
     <select id="searchByLoginPaged" resultMap="UserAccountResultMap">
         SELECT *
         FROM user_account
-        WHERE github_login LIKE CONCAT('%', #{query}, '%')
+        <where>
+            <if test="query != null and query != ''">
+                (github_login LIKE CONCAT('%', #{query}, '%')
+                OR github_email LIKE CONCAT('%', #{query}, '%')
+                OR github_name LIKE CONCAT('%', #{query}, '%'))
+            </if>
+        </where>
         ORDER BY github_login ASC
-        LIMIT #{pageSize}
-        OFFSET #{offset}
+        LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
     <!-- Update all fields (profile change) -->
@@ -99,6 +110,12 @@
     <select id="countByLogin" resultType="long">
         SELECT COUNT(*)
         FROM user_account
-        WHERE github_login LIKE CONCAT('%', #{keyword}, '%')
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (github_login LIKE CONCAT('%', #{keyword}, '%')
+                OR github_email LIKE CONCAT('%', #{keyword}, '%')
+                OR github_name LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
     </select>
 </mapper>
