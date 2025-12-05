@@ -4,7 +4,6 @@ import com.ssafy.commitmood.domain.github.entity.GithubRepo;
 import com.ssafy.commitmood.domain.github.mapper.GithubRepoMapper;
 import com.ssafy.commitmood.dto.GithubCommitDto;
 import com.ssafy.commitmood.dto.GithubCommitStatsDto;
-import com.ssafy.commitmood.reader.GithubReader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemReader;
 
