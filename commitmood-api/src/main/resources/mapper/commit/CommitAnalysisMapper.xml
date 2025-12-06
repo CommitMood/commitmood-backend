@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.commitmood.domain.commit.mapper.CommitAnalysisMapper">
+
+    <resultMap id="commitAnalysisResultMap" type="com.ssafy.commitmood.domain.commit.entity.CommitAnalysis">
+        <id property="id" column="COMMIT_ANALYSIS_ID"/>
+        <result property="commitLogId" column="COMMIT_LOG_ID"/>
+        <result property="flaggedCount" column="FLAGGED_COUNT"/>
+        <result property="swearCount" column="SWEAR_COUNT"/>
+        <result property="exclaimCount" column="EXCLAIM_COUNT"/>
+        <result property="emojiCount" column="EMOJI_COUNT"/>
+        <result property="sentiment" column="SENTIMENT"
+                typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="sentimentScore" column="SENTIMENT_SCORE"/>
+        <result property="analyzedAt" column="ANALYZED_AT"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
+    </resultMap>
+
+    <!-- SELECT BY COMMIT_LOG_ID -->
+    <select id="findByCommitLogId" resultMap="commitAnalysisResultMap">
+        SELECT
+            COMMIT_ANALYSIS_ID,
+            COMMIT_LOG_ID,
+            FLAGGED_COUNT,
+            SWEAR_COUNT,
+            EXCLAIM_COUNT,
+            EMOJI_COUNT,
+            SENTIMENT,
+            SENTIMENT_SCORE,
+            ANALYZED_AT,
+            CREATED_AT,
+            UPDATED_AT
+        FROM COMMIT_ANALYSIS
+        WHERE COMMIT_LOG_ID = #{commitLogId}
+    </select>
+
+    <!-- INSERT -->
+    <insert id="insert" parameterType="com.ssafy.commitmood.domain.commit.entity.CommitAnalysis"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="COMMIT_ANALYSIS_ID">
+        INSERT INTO COMMIT_ANALYSIS (
+            COMMIT_LOG_ID,
+            FLAGGED_COUNT,
+            SWEAR_COUNT,
+            EXCLAIM_COUNT,
+            EMOJI_COUNT,
+            SENTIMENT,
+            SENTIMENT_SCORE,
+            ANALYZED_AT,
+            CREATED_AT,
+            UPDATED_AT
+        ) VALUES (
+                     #{commitLogId},
+                     #{flaggedCount},
+                     #{swearCount},
+                     #{exclaimCount},
+                     #{emojiCount},
+                     #{sentiment},
+                     #{sentimentScore},
+                     #{analyzedAt},
+                     CURRENT_TIMESTAMP,
+                     CURRENT_TIMESTAMP
+                 )
+    </insert>
+
+    <!-- UPDATE -->
+    <update id="update" parameterType="com.ssafy.commitmood.domain.commit.entity.CommitAnalysis">
+        UPDATE COMMIT_ANALYSIS
+        SET FLAGGED_COUNT = #{flaggedCount},
+            SWEAR_COUNT = #{swearCount},
+            EXCLAIM_COUNT = #{exclaimCount},
+            EMOJI_COUNT = #{emojiCount},
+            SENTIMENT = #{sentiment},
+            SENTIMENT_SCORE = #{sentimentScore},
+            ANALYZED_AT = #{analyzedAt},
+            UPDATED_AT = CURRENT_TIMESTAMP
+        WHERE COMMIT_ANALYSIS_ID = #{id}
+    </update>
+
+    <!-- DELETE BY ID -->
+    <delete id="deleteById">
+        DELETE FROM COMMIT_ANALYSIS
+        WHERE COMMIT_ANALYSIS_ID = #{id}
+    </delete>
+
+    <!-- SELECT BY ID -->
+    <select id="findById" resultMap="commitAnalysisResultMap">
+        SELECT
+            COMMIT_ANALYSIS_ID,
+            COMMIT_LOG_ID,
+            FLAGGED_COUNT,
+            SWEAR_COUNT,
+            EXCLAIM_COUNT,
+            EMOJI_COUNT,
+            SENTIMENT,
+            SENTIMENT_SCORE,
+            ANALYZED_AT,
+            CREATED_AT,
+            UPDATED_AT
+        FROM COMMIT_ANALYSIS
+        WHERE COMMIT_ANALYSIS_ID = #{id}
+    </select>
+
+</mapper>
