@@ -169,8 +169,9 @@ for i in range(COMMIT_COUNT):
 
     f_commit.write(
         f"INSERT INTO COMMIT_LOG (ID,GITHUB_REPO_ID,USER_ACCOUNT_ID,GITHUB_COMMIT_SHA,COMMITTED_AT,MESSAGE,ADDITIONS,DELETIONS,TOTAL_CHANGES)"
-        f" VALUES({cid},{random.choice(repo_ids)},{random.choice(user_ids)},'{sha()}',NOW() - INTERVAL {random.randint(0, 365)} DAY,"
-        f"'{msg}',{random.randint(0, 300)},{random.randint(0, 100)},{random.randint(0, 400)});\n"
+        f" VALUES({cid},{random.choice(repo_ids)},{random.choice(user_ids)},'{sha()}',"
+        f"DATEADD('DAY', -{random.randint(0,365)}, CURRENT_TIMESTAMP()),"
+        f"'{msg}',{random.randint(0,300)},{random.randint(0,100)},{random.randint(0,400)});\n"
     )
 
 ##############################################
@@ -223,7 +224,7 @@ for cid in commit_ids:
     for token in found:
         f_token.write(
             f"INSERT INTO FLAGGED_TOKEN (COMMIT_LOG_ID,TOKEN,TOKEN_TYPE,WEIGHT)"
-            f" VALUES({cid},'{token}','NEGATIVE',{random.randint(1, 3)});\n"
+            f" VALUES({cid},'{token}','SWEAR',{random.randint(1, 3)});\n"
         )
 
 print("\n🎉 SQL 파일 생성 완료 → generated/ 폴더 확인\n")
