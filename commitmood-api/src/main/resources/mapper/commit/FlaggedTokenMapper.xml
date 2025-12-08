@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.commitmood.domain.commit.mapper.FlaggedTokenMapper">
+
+<resultMap id="flaggedTokenResultMap" type="com.ssafy.commitmood.domain.commit.entity.FlaggedToken">
+    <id property="id" column="ID"/>
+    <result property="commitLogId" column="COMMIT_LOG_ID"/>
+    <result property="token" column="TOKEN"/>
+    <result property="tokenType" column="TOKEN_TYPE" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+    <result property="weight" column="WEIGHT"/>
+    <result property="createdAt" column="CREATED_AT"/>
+    <result property="updatedAt" column="UPDATED_AT"/>
+</resultMap>
+
+    <select id="findAllByCommitLogId" resultMap="flaggedTokenResultMap">
+        SELECT *
+        FROM FLAGGED_TOKEN
+        WHERE COMMIT_LOG_ID = #{commitLogId}
+        ORDER BY WEIGHT DESC, TOKEN
+    </select>
+
+</mapper>

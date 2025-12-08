@@ -2,6 +2,10 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://your-prod-host:3306/commitmooddb?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+  data:
+    rest:
+      base-path: /api
+
 
 mybatis:
   mapper-locations: classpath:/mapper/**/*.xml
