@@ -2,7 +2,6 @@ package com.ssafy.commitmood.domain.commit.dto.response;
 
 import com.ssafy.commitmood.domain.commit.entity.CommitAnalysis;
 import lombok.Builder;
-import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 

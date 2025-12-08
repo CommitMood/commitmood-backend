@@ -1,9 +1,9 @@
 package com.ssafy.commitmood.domain.commit.repository.mapper;
 
-import java.util.List;
-
 import com.ssafy.commitmood.domain.commit.entity.FlaggedToken;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 @Mapper
 public interface FlaggedTokenMapper {

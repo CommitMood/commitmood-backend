@@ -1,6 +1,7 @@
 package com.ssafy.commitmood.domain.github.dto.response;
 
 import com.ssafy.commitmood.domain.github.entity.GithubRepo;
+
 import java.time.LocalDateTime;
 
 public record GithubRepoResponse(

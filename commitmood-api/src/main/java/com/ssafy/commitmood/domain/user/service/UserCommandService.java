@@ -3,10 +3,11 @@ package com.ssafy.commitmood.domain.user.service;
 import com.ssafy.commitmood.domain.user.dto.request.GithubProfileUpdateRequest;
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
 import com.ssafy.commitmood.domain.user.repository.UserAccountRepository;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor

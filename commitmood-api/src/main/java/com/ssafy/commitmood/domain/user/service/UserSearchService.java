@@ -4,9 +4,10 @@ import com.ssafy.commitmood.common.dto.response.PageResponse;
 import com.ssafy.commitmood.domain.user.dto.response.UserSearchResponse;
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
 import com.ssafy.commitmood.domain.user.repository.UserAccountRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor

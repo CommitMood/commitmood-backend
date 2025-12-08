@@ -1,19 +1,20 @@
 package com.ssafy.commitmood.domain.user.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-
 import com.ssafy.commitmood.common.dto.response.PageResponse;
 import com.ssafy.commitmood.domain.user.dto.response.UserSearchResponse;
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
 import com.ssafy.commitmood.domain.user.repository.UserAccountRepository;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class UserSearchServiceTest {

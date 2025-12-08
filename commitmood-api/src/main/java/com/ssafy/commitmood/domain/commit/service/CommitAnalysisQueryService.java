@@ -4,7 +4,6 @@ import com.ssafy.commitmood.domain.commit.dto.response.CommitAnalysisResponse;
 import com.ssafy.commitmood.domain.commit.entity.CommitAnalysis;
 import com.ssafy.commitmood.domain.commit.repository.CommitAnalysisRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

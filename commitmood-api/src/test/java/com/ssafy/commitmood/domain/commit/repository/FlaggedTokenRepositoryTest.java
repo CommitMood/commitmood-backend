@@ -1,6 +1,7 @@
 package com.ssafy.commitmood.domain.commit.repository;
 
 import com.ssafy.commitmood.domain.commit.entity.FlaggedToken;
+import com.ssafy.commitmood.domain.commit.entity.FlaggedToken.TokenType;
 import com.ssafy.commitmood.domain.commit.repository.mapper.FlaggedTokenMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.ssafy.commitmood.domain.commit.entity.FlaggedToken.TokenType;
 
 import java.util.List;
 

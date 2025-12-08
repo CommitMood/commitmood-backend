@@ -1,11 +1,7 @@
 package com.ssafy.commitmood.domain.user.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
 import com.ssafy.commitmood.domain.user.mapper.UserAccountMapper;
-import java.time.LocalDateTime;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
@@ -13,6 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @MybatisTest
 @ActiveProfiles("local")
