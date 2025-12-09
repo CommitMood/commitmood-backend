@@ -52,7 +52,7 @@ public class UserStreakQueryServiceTest {
         assertThat(response.end()).isEqualTo(today);
 
         assertThat(response.commits().get(6)).isEqualTo(3); // today
-        assertThat(response.commits().get(4)).isEqualTo(2); // today - 2
+        assertThat(response.commits().get(0)).isEqualTo(2); // today - 2
         assertThat(response.commits().get(5)).isEqualTo(0); // today - 1 (커밋 없음)
     }
 
@@ -68,8 +68,8 @@ public class UserStreakQueryServiceTest {
 
         StreakResponse response = service.getStreakByUserId(userAccountId, "month");
 
-        assertThat(response.commits()).hasSize(28);
-        assertThat(response.start()).isEqualTo(today.minusDays(27));
+        assertThat(response.commits()).hasSize(30);
+        assertThat(response.start()).isEqualTo(today.minusDays(29));
         assertThat(response.end()).isEqualTo(today);
         assertThat(response.commits()).allMatch(count -> count == 0);
     }
