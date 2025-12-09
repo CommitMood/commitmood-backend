@@ -1,6 +1,7 @@
 package com.ssafy.commitmood.domain.commit.controller;
 
 import com.ssafy.commitmood.common.dto.response.PageResponse;
+import com.ssafy.commitmood.domain.commit.dto.response.RankingListResponse;
 import com.ssafy.commitmood.domain.commit.service.RankingQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,10 +24,10 @@ public class RankingQueryController {
      * @return 페이지네이션된 사용자 랭킹 목록
      */
     @GetMapping
-    public PageResponse<?> getRankings(
+    public PageResponse<RankingListResponse> getRankings(
             @RequestParam(required = false, defaultValue = "commit_count") String option,
             @RequestParam(required = false, defaultValue = "1") int page,
-            @RequestParam(required = false, defaultValue = "10") int perPage
+            @RequestParam(required = false, defaultValue = "10", name = "per_page") int perPage
     ) {
         return service.getRankings(option, page, perPage);
     }
