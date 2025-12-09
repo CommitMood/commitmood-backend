@@ -30,15 +30,15 @@ public class UserRankingQueryService {
 
         switch (detail == null ? "repo" : detail.toLowerCase()) {
             case "flagged" -> {
-                details = repository.findUserRankingByFlagged(userAccountId, offset, perPage);
+                details = repository.findUserRankingByFlagged(userAccountId, perPage, offset);
                 total = repository.countUserRankingByFlagged(userAccountId);
             }
             case "sentiment" -> {
-                details = repository.findUserRankingBySentiment(userAccountId, offset, perPage);
+                details = repository.findUserRankingBySentiment(userAccountId, perPage, offset);
                 total = repository.countUserRankingBySentiment(userAccountId);
             }
             default -> {
-                details = repository.findUserRankingByFlagged(userAccountId, offset, perPage);
+                details = repository.findUserRankingByRepo(userAccountId, perPage, offset);
                 total = repository.countUserRankingByRepo(userAccountId);
             }
         }
