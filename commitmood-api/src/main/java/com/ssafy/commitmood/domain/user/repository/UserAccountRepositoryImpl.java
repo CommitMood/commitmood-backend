@@ -1,13 +1,13 @@
 package com.ssafy.commitmood.domain.user.repository;
 
+import com.ssafy.commitmood.domain.user.dto.request.UserAccountQueryCondition;
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
 import com.ssafy.commitmood.domain.user.mapper.UserAccountMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
@@ -26,13 +26,13 @@ public class UserAccountRepositoryImpl implements UserAccountRepository {
     }
 
     @Override
-    public Optional<UserAccount> findByGithubUserId(Long githubUserId) {
-        return mapper.findByGithubUserId(githubUserId);
+    public Optional<UserAccount> findByPrefixOne(UserAccountQueryCondition condition) {
+        return mapper.findByPrefixOne(condition);
     }
 
     @Override
-    public Optional<UserAccount> findByGithubLogin(String githubLogin) {
-        return mapper.findByGithubLogin(githubLogin);
+    public List<UserAccount> findAllByPrefix(UserAccountQueryCondition condition) {
+        return mapper.findAllByPrefix(condition);
     }
 
     @Override

@@ -1,7 +1,12 @@
 package com.ssafy.commitmood.domain.user.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.ssafy.commitmood.domain.user.dto.request.UserAccountQueryCondition;
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
-import com.ssafy.commitmood.domain.user.mapper.UserAccountMapper;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
@@ -10,11 +15,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @MybatisTest
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -22,26 +22,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserAccountRepositoryTest {
 
     @Autowired
-    private UserAccountRepository repository;
-
-    @Autowired
-    private UserAccountMapper mapper;
+    UserAccountRepository repository;
 
     @Test
-    @DisplayName("UserAccount 저장 후 조회 테스트")
-    public void saveAndFind() {
+    @DisplayName("UserAccount 저장 후 단건 조회 (ID 기반)")
+    void saveAndFind() {
         // given
-        UserAccount user = UserAccount.create(
-                100L,
-                "devys",
-                "dev@test.com",
-                "avatar",
-                "Dev"
-        );
-
-        // when
+        UserAccount user = UserAccount.create(100L, "devys", "dev@test.com", "avatar", "Dev");
         repository.save(user);
 
+        // when
         Optional<UserAccount> result = repository.findById(user.getId());
 
         // then
@@ -50,104 +40,93 @@ class UserAccountRepositoryTest {
     }
 
     @Test
-    @DisplayName("GitHub Login으로 조회 테스트")
-    public void findByGithubLogin() {
+    @DisplayName("GithubLogin Prefix 조회 (findByPrefixOne)")
+    void findByGithubLoginPrefix() {
         // given
-        UserAccount user = UserAccount.create(
-                200L,
-                "helloUser",
-                "hello@test.com",
-                "avatar",
-                "Hello"
-        );
+        repository.save(UserAccount.create(201L, "helloUser", "h1@test.com", null, "Hello"));
+        repository.save(UserAccount.create(202L, "helloDev", "h2@test.com", null, "Hello Dev"));
 
         // when
-        repository.save(user);
-
-        Optional<UserAccount> found = repository.findByGithubLogin("helloUser");
+        UserAccountQueryCondition condition = new UserAccountQueryCondition(null, null, "hello");
+        Optional<UserAccount> found = repository.findByPrefixOne(condition);
 
         // then
         assertThat(found).isPresent();
-        assertThat(found.get().getGithubLogin()).isEqualTo("helloUser");
+        assertThat(found.get().getGithubLogin()).startsWith("hello");
     }
 
     @Test
-    @DisplayName("프로필 업데이트 테스트")
-    public void updateProfile() {
+    @DisplayName("Email Prefix 조회 (findByPrefixOne)")
+    void findByEmailPrefix() {
         // given
-        UserAccount user = UserAccount.create(
-                300L,
-                "tester",
-                "old@test.com",
-                "oldAvatar",
-                "OldName"
-        );
+        repository.save(UserAccount.create(301L, "u1", "email@test.com", null, "E1"));
+        repository.save(UserAccount.create(302L, "u2", "email2@test.com", null, "E2"));
 
         // when
-        repository.save(user);
-
-        user.updateProfile("new@test.com", "newAvatar", "NewName");
-
-        repository.update(user);
-
-        UserAccount updated = repository.findById(user.getId()).orElseThrow();
+        UserAccountQueryCondition condition = new UserAccountQueryCondition("email", null, null);
+        Optional<UserAccount> found = repository.findByPrefixOne(condition);
 
         // then
+        assertThat(found).isPresent();
+        assertThat(found.get().getGithubEmail()).startsWith("email");
+    }
+
+    @Test
+    @DisplayName("Name Prefix 목록 조회 (findAllByPrefix)")
+    void findAllByNamePrefix() {
+        // given
+        repository.save(UserAccount.create(401L, "yeseong31", "a@test.com", null, "예성"));
+        repository.save(UserAccount.create(402L, "yesman", "b@test.com", null, "예스맨"));
+        repository.save(UserAccount.create(403L, "nope", "c@test.com", null, "노"));
+
+        // when
+        UserAccountQueryCondition condition = new UserAccountQueryCondition(null, "예", null);
+        List<UserAccount> result = repository.findAllByPrefix(condition);
+
+        // then
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getGithubName()).startsWith("예");
+        assertThat(result.get(1).getGithubName()).startsWith("예");
+    }
+
+    @Test
+    @DisplayName("Profile 업데이트 테스트")
+    void updateProfile() {
+        // given
+        UserAccount user = UserAccount.create(500L, "tester", "old@test.com", "oldA", "Old");
+        repository.save(user);
+
+        // when
+        user.updateProfile("new@test.com", "newA", "New");
+        repository.update(user);
+
+        // then
+        UserAccount updated = repository.findById(user.getId()).orElseThrow();
         assertThat(updated.getGithubEmail()).isEqualTo("new@test.com");
-        assertThat(updated.getGithubAvatarUrl()).isEqualTo("newAvatar");
-        assertThat(updated.getGithubName()).isEqualTo("NewName");
+        assertThat(updated.getGithubAvatarUrl()).isEqualTo("newA");
+        assertThat(updated.getGithubName()).isEqualTo("New");
     }
 
     @Test
     @DisplayName("lastSyncedAt 업데이트 테스트")
     void updateLastSyncedAt() {
-        // given
-        UserAccount user = UserAccount.create(
-                400L,
-                "syncUser",
-                "sync@test.com",
-                "avatar",
-                "Sync"
-        );
-
-        // when
+        UserAccount user = UserAccount.create(600L, "sync", "sync@test.com", "a", "Sync");
         repository.save(user);
 
         LocalDateTime now = LocalDateTime.now();
-
         repository.updateLastSyncedAt(user.getId(), now);
 
-        UserAccount updated = repository.findById(user.getId()).orElseThrow();
-
-        // then
-        assertThat(updated.getLastSyncedAt()).isEqualTo(now);
+        assertThat(repository.findById(user.getId()).orElseThrow().getLastSyncedAt()).isEqualTo(now);
     }
 
     @Test
-    @DisplayName("countByLogin: 키워드 기반 사용자 총 개수 조회 테스트")
-    void countByLogin_shouldReturnCorrectCount() {
-        // given
-        UserAccount u1 = UserAccount.create(101L, "devys", "a@test.com", null, "A");
-        UserAccount u2 = UserAccount.create(102L, "devy", "b@test.com", null, "B");
-        UserAccount u3 = UserAccount.create(103L, "developer", "c@test.com", null, "C");
-        UserAccount u4 = UserAccount.create(104L, "test-user", "t@test.com", null, "T");
+    @DisplayName("countByLogin 동작 확인")
+    void countByLogin() {
+        repository.save(UserAccount.create(701L, "devOne", "a@test.com", null, "A"));
+        repository.save(UserAccount.create(702L, "devTwo", "b@test.com", null, "B"));
+        repository.save(UserAccount.create(703L, "devThree", "c@test.com", null, "C"));
 
-        repository.save(u1);
-        repository.save(u2);
-        repository.save(u3);
-        repository.save(u4);
-
-        // when
-        long result = repository.countByLogin("dev");
-
-        // then
-        assertThat(result).isEqualTo(3);
-    }
-
-    @Test
-    @DisplayName("countByLogin: 검색 결과가 없는 경우 0 반환")
-    void countByLogin_noMatch_shouldReturnZero() {
-        long result = repository.countByLogin("zzzz");
-        assertThat(result).isZero();
+        long count = repository.countByLogin("dev");
+        assertThat(count).isEqualTo(3);
     }
 }

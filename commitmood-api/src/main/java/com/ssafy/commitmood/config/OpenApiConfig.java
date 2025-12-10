@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
                 )
         ),
         servers = {
+                @Server(url = "/api", description = "Reverse Proxy Base URL"),
                 @Server(url = "http://localhost:8080", description = "Local"),
                 @Server(url = "https://commitmood.web.app", description = "Prod")
         }
