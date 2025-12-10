@@ -458,3 +458,10 @@ commitmood-batch/src/main/resources/*.secret.yml
 *.local.yml
 *.local.json
 **/.postman/config.json
+
+# === H2 Local Data Files ===
+/data/
+!/data/.gitkeep
+/data/*.mv.db
+/data/*.mv.db.lock
+/data/*.trace.db
