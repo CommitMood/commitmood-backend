@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.commitmood.domain.commit.repository.CommitLogMapper">
+
+    <!-- 커밋 로그 저장 -->
+    <insert id="insert" parameterType="com.ssafy.commitmood.domain.commit.entity.CommitLog"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO commit_log (
+            github_repo_id,
+            user_account_id,
+            github_commit_sha,
+            committed_at,
+            message,
+            html_url,
+            additions,
+            deletions,
+            total_changes,
+            files_changed,
+            created_at,
+            updated_at
+        ) VALUES (
+                     #{githubRepoId},
+                     #{userAccountId},
+                     #{githubCommitSha},
+                     #{committedAt},
+                     #{message},
+                     #{htmlUrl},
+                     #{additions},
+                     #{deletions},
+                     #{totalChanges},
+                     #{filesChanged},
+                     NOW(),
+                     NOW()
+                 )
+    </insert>
+
+</mapper>

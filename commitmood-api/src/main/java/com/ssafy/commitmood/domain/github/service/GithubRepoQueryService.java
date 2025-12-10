@@ -5,10 +5,11 @@ import com.ssafy.commitmood.domain.github.dto.response.GithubRepoListResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoResponse;
 import com.ssafy.commitmood.domain.github.entity.GithubRepo;
 import com.ssafy.commitmood.domain.github.repository.GithubRepoRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor

@@ -1,11 +1,12 @@
 package com.ssafy.commitmood.domain.github.mapper;
 
 import com.ssafy.commitmood.domain.github.entity.GithubRepo;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface GithubRepoMapper {

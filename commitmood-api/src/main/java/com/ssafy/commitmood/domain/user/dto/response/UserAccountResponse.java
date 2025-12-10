@@ -1,6 +1,7 @@
 package com.ssafy.commitmood.domain.user.dto.response;
 
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
+
 import java.time.LocalDateTime;
 
 public record UserAccountResponse(
