@@ -61,14 +61,14 @@ class UserCommandControllerTest {
     }
 
     @Test
-    @DisplayName("사용자 삭제 API는 200 또는 204 성공 코드를 반환해야 한다")
+    @DisplayName("사용자 삭제 API는 204 No Content를 반환해야 한다")
     void deleteUser_success() throws Exception {
         // given
         Long userId = 10L;
 
         // when & then
         mockMvc.perform(delete("/users/{id}", userId))
-                .andExpect(status().isOk()); // 컨트롤러가 void라면 기본 200
+                .andExpect(status().isNoContent());
 
         then(userCommandService).should().deleteUser(eq(userId));
     }
