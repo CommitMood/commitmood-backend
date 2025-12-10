@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.commitmood.domain.commit.repository.RankingMapper">
+
+    <!-- UserRankingDto ResultMap -->
+    <resultMap id="userRankingResultMap"
+               type="com.ssafy.commitmood.domain.commit.dto.UserRankingDto">
+        <result property="userAccountId" column="user_account_id"/>
+        <result property="githubLogin" column="github_login"/>
+        <result property="githubAvatarUrl" column="github_avatar_url"/>
+        <result property="totalCommits" column="total_commits"/>
+        <result property="totalFlagged" column="total_flagged"/>
+        <result property="totalSwear" column="total_swear"/>
+        <result property="avgSentimentScore" column="avg_sentiment_score"/>
+        <result property="lastCommitAt" column="last_commit_at"/>
+    </resultMap>
+
+    <!-- UserRepoStatsDto ResultMap -->
+    <resultMap id="userRepoStatsResultMap"
+               type="com.ssafy.commitmood.domain.commit.dto.UserRepoStatsDto">
+        <result property="githubRepoId" column="github_repo_id"/>
+        <result property="githubRepoName" column="github_repo_name"/>
+        <result property="githubRepoFullName" column="github_repo_full_name"/>
+        <result property="commitCount" column="commit_count"/>
+        <result property="totalAdditions" column="total_additions"/>
+        <result property="totalDeletions" column="total_deletions"/>
+        <result property="lastCommitAt" column="last_commit_at"/>
+    </resultMap>
+
+    <!-- UserFlaggedStatsDto ResultMap -->
+    <resultMap id="userFlaggedStatsResultMap"
+               type="com.ssafy.commitmood.domain.commit.dto.UserFlaggedStatsDto">
+        <result property="token" column="token"/>
+        <result property="tokenType" column="token_type"/>
+        <result property="occurrenceCount" column="occurrence_count"/>
+        <result property="totalWeight" column="total_weight"/>
+    </resultMap>
+
+    <!-- UserSentimentStatsDto ResultMap -->
+    <resultMap id="userSentimentStatsResultMap"
+               type="com.ssafy.commitmood.domain.commit.dto.UserSentimentStatsDto">
+        <result property="positiveCount" column="positive_count"/>
+        <result property="neutralCount" column="neutral_count"/>
+        <result property="negativeCount" column="negative_count"/>
+        <result property="avgSentimentScore" column="avg_sentiment_score"/>
+        <result property="maxSentimentScore" column="max_sentiment_score"/>
+        <result property="minSentimentScore" column="min_sentiment_score"/>
+    </resultMap>
+
+    <!-- 공통 서브쿼리: 사용자별 집계 통계 -->
+    <sql id="userStatsSubquery">
+        SELECT
+            ua.id as user_account_id,
+            ua.github_login,
+            ua.github_avatar_url,
+            COUNT(DISTINCT cl.id) as total_commits,
+            COALESCE(SUM(ca.flagged_count), 0) as total_flagged,
+            COALESCE(SUM(ca.swear_count), 0) as total_swear,
+            AVG(ca.sentiment_score) as avg_sentiment_score,
+            MAX(cl.committed_at) as last_commit_at
+        FROM user_account ua
+                 LEFT JOIN commit_log cl ON ua.id = cl.user_account_id
+                 LEFT JOIN commit_analysis ca ON cl.id = ca.commit_log_id
+        GROUP BY ua.id, ua.github_login, ua.github_avatar_url
+    </sql>
+
+    <!-- 전체 사용자 랭킹 조회 (커밋 수 기준) -->
+    <select id="findRankingByCommitCount" resultMap="userRankingResultMap">
+        SELECT *
+        FROM (
+        <include refid="userStatsSubquery"/>
+        ) as user_stats
+        WHERE total_commits > 0
+        ORDER BY total_commits DESC, last_commit_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 전체 사용자 랭킹 조회 (플래그 토큰 수 기준) -->
+    <select id="findRankingByFlaggedCount" resultMap="userRankingResultMap">
+        SELECT *
+        FROM (
+        <include refid="userStatsSubquery"/>
+        ) as user_stats
+        WHERE total_flagged > 0
+        ORDER BY total_flagged DESC, total_commits DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 전체 사용자 랭킹 조회 (욕설 수 기준) -->
+    <select id="findRankingBySwearCount" resultMap="userRankingResultMap">
+        SELECT *
+        FROM (
+        <include refid="userStatsSubquery"/>
+        ) as user_stats
+        WHERE total_swear > 0
+        ORDER BY total_swear DESC, total_commits DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 전체 사용자 랭킹 조회 (감정 점수 기준) -->
+    <select id="findRankingBySentimentScore" resultMap="userRankingResultMap">
+        SELECT *
+        FROM (
+        <include refid="userStatsSubquery"/>
+        ) as user_stats
+        WHERE avg_sentiment_score IS NOT NULL
+        ORDER BY avg_sentiment_score DESC, total_commits DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 전체 사용자 랭킹 조회 (최근 활동 기준) -->
+    <select id="findRankingByRecentActivity" resultMap="userRankingResultMap">
+        SELECT *
+        FROM (
+        <include refid="userStatsSubquery"/>
+        ) as user_stats
+        WHERE last_commit_at IS NOT NULL
+        ORDER BY last_commit_at DESC, total_commits DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 특정 사용자의 저장소별 통계 조회 -->
+    <select id="findUserRepoStats" resultMap="userRepoStatsResultMap">
+        SELECT
+            gr.github_repo_id,
+            gr.github_repo_name,
+            gr.github_repo_full_name,
+            COUNT(cl.id) as commit_count,
+            COALESCE(SUM(cl.additions), 0) as total_additions,
+            COALESCE(SUM(cl.deletions), 0) as total_deletions,
+            MAX(cl.committed_at) as last_commit_at
+        FROM github_repo gr
+                 INNER JOIN commit_log cl ON gr.id = cl.github_repo_id
+        WHERE cl.user_account_id = #{userAccountId}
+        GROUP BY gr.github_repo_id, gr.github_repo_name, gr.github_repo_full_name
+        ORDER BY commit_count DESC, last_commit_at DESC
+            LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 특정 사용자의 플래그 토큰 통계 조회 -->
+    <select id="findUserFlaggedStats" resultMap="userFlaggedStatsResultMap">
+        SELECT
+            ft.token,
+            ft.token_type,
+            COUNT(*) as occurrence_count,
+            SUM(ft.weight) as total_weight
+        FROM flagged_token ft
+                 INNER JOIN commit_log cl ON ft.commit_log_id = cl.id
+        WHERE cl.user_account_id = #{userAccountId}
+        GROUP BY ft.token, ft.token_type
+        ORDER BY occurrence_count DESC, total_weight DESC
+            LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 특정 사용자의 감정 분석 통계 조회 -->
+    <select id="findUserSentimentStats" resultMap="userSentimentStatsResultMap">
+        SELECT
+            SUM(CASE WHEN ca.sentiment = 'POSITIVE' THEN 1 ELSE 0 END) as positive_count,
+            SUM(CASE WHEN ca.sentiment = 'NEUTRAL' THEN 1 ELSE 0 END) as neutral_count,
+            SUM(CASE WHEN ca.sentiment = 'NEGATIVE' THEN 1 ELSE 0 END) as negative_count,
+            AVG(ca.sentiment_score) as avg_sentiment_score,
+            MAX(ca.sentiment_score) as max_sentiment_score,
+            MIN(ca.sentiment_score) as min_sentiment_score
+        FROM commit_analysis ca
+                 INNER JOIN commit_log cl ON ca.commit_log_id = cl.id
+        WHERE cl.user_account_id = #{userAccountId}
+    </select>
+
+</mapper>
