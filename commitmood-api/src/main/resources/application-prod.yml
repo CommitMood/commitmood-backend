@@ -1,12 +1,16 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://your-prod-host:3306/commitmooddb?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
 mybatis:
   mapper-locations: classpath:/mapper/**/*.xml
   type-aliases-package: com.ssafy.commitmood.domain
   configuration:
     map-underscore-to-camel-case: true
-    jdbc-type-for-null: NULL
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+logging:
+  level:
+    com.ssafy.commitmood: DEBUG
