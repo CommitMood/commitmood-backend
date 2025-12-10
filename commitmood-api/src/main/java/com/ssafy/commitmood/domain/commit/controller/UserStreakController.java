@@ -1,5 +1,6 @@
 package com.ssafy.commitmood.domain.commit.controller;
 
+import com.ssafy.commitmood.domain.commit.common.DateOptionsEnum;
 import com.ssafy.commitmood.domain.commit.dto.response.UserStreakResponse;
 import com.ssafy.commitmood.domain.commit.service.UserStreakService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +29,7 @@ public class UserStreakController {
     @GetMapping("/{userAccountId}")
     public ResponseEntity<UserStreakResponse> getUserStreak(
             @PathVariable Long userAccountId,
-            @RequestParam(defaultValue = "month") String option
+            @RequestParam(defaultValue = "month") DateOptionsEnum option
     ) {
         UserStreakResponse response = userStreakService.getUserStreak(userAccountId, option);
         return ResponseEntity.ok(response);
