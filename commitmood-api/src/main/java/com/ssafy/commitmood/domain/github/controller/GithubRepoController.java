@@ -1,5 +1,6 @@
 package com.ssafy.commitmood.domain.github.controller;
 
+import com.ssafy.commitmood.common.dto.response.PageResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoListResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoResponse;
 import com.ssafy.commitmood.domain.github.service.GithubRepoQueryService;
@@ -43,23 +44,32 @@ public class GithubRepoController {
     }
 
     @Operation(
-            summary = "GitHub Repo 검색",
-            description = "keyword 기반 검색 / (page, size 성립 시 페이징) → 둘 다 없으면 일반 검색으로 처리됨."
+            summary = "GitHub Repo 검색 (비페이징)",
+            description = "keyword 기반으로 GitHub Repo 리스트를 조회한다."
     )
     @GetMapping("/repos/search")
-    public Object searchRepos(
+    public GithubRepoListResponse searchRepos(
+            @Parameter(description = "검색 keyword", example = "spring")
+            @RequestParam String keyword
+    ) {
+        return githubRepoQueryService.search(keyword);
+    }
+
+    @Operation(
+            summary = "GitHub Repo 검색 (페이징)",
+            description = "keyword 기반으로 GitHub Repo를 페이징 조회한다."
+    )
+    @GetMapping("/repos/search/page")
+    public PageResponse<GithubRepoResponse> searchReposPaged(
             @Parameter(description = "검색 keyword", example = "spring")
             @RequestParam String keyword,
 
-            @Parameter(description = "페이지 번호(옵션)", example = "1")
-            @RequestParam(required = false) Integer page,
+            @Parameter(description = "페이지 번호(1부터 시작)", example = "1")
+            @RequestParam(defaultValue = "1") int page,
 
-            @Parameter(description = "페이지 사이즈(옵션)", example = "10")
-            @RequestParam(required = false) Integer size
+            @Parameter(description = "페이지 사이즈", example = "10")
+            @RequestParam(defaultValue = "10") int size
     ) {
-        if (page == null || size == null) {
-            return githubRepoQueryService.search(keyword);
-        }
         return githubRepoQueryService.searchPaged(keyword, page, size);
     }
 
