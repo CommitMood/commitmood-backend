@@ -1,5 +1,6 @@
 package com.ssafy.commitmood.domain.commit.service;
 
+import com.ssafy.commitmood.domain.commit.common.DateOptionsEnum;
 import com.ssafy.commitmood.domain.commit.dto.DailyCommitCountDto;
 import com.ssafy.commitmood.domain.commit.dto.response.UserStreakResponse;
 import com.ssafy.commitmood.domain.commit.repository.UserStreakMapper;
@@ -17,7 +18,13 @@ public class UserStreakService {
 
     private final UserStreakMapper userStreakMapper;
 
-    public UserStreakResponse getUserStreak(Long userAccountId, String option) {
+    public UserStreakResponse getUserStreak(Long userAccountId, DateOptionsEnum option) {
+        try {
+            DateOptionsEnum.valueOf(option.name());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("유효하지 않은 옵션입니다: " + option);
+        }
+
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = calculateStartDate(endDate, option);
 
@@ -44,12 +51,11 @@ public class UserStreakService {
     /**
      * 옵션에 따른 시작 날짜 계산
      */
-    private LocalDate calculateStartDate(LocalDate endDate, String option) {
-        return switch (option.toLowerCase()) {
-            case "week" -> endDate.minusWeeks(1);
-            case "month" -> endDate.minusMonths(1);
-            case "year" -> endDate.minusYears(1);
-            default -> throw new IllegalArgumentException("유효하지 않은 옵션입니다: " + option);
+    private LocalDate calculateStartDate(LocalDate endDate, DateOptionsEnum option) {
+        return switch (option) {
+            case week -> endDate.minusWeeks(1);
+            case month -> endDate.minusMonths(1);
+            case year -> endDate.minusYears(1);
         };
     }
 

@@ -1,7 +1,7 @@
 package com.ssafy.commitmood.domain.user.repository;
 
+import com.ssafy.commitmood.domain.user.dto.request.UserAccountQueryCondition;
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -12,9 +12,9 @@ public interface UserAccountRepository {
 
     Optional<UserAccount> findById(Long id);
 
-    Optional<UserAccount> findByGithubUserId(Long githubUserId);
+    Optional<UserAccount> findByPrefixOne(UserAccountQueryCondition condition);
 
-    Optional<UserAccount> findByGithubLogin(String githubLogin);
+    List<UserAccount> findAllByPrefix(UserAccountQueryCondition condition);
 
     List<UserAccount> searchByLoginLike(String query);
 

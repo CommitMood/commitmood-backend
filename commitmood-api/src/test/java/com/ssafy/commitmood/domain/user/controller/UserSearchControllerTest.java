@@ -1,9 +1,16 @@
 package com.ssafy.commitmood.domain.user.controller;
 
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.commitmood.common.dto.response.PageResponse;
 import com.ssafy.commitmood.domain.user.dto.response.UserSearchResponse;
 import com.ssafy.commitmood.domain.user.service.UserSearchService;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,14 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class UserSearchControllerTest {
@@ -42,7 +41,7 @@ class UserSearchControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/users/search 단순 검색 성공")
+    @DisplayName("GET /users/search 단순 검색 성공")
     void search_success() throws Exception {
         // given
         String keyword = "dev";
@@ -55,7 +54,7 @@ class UserSearchControllerTest {
         given(searchService.search(keyword)).willReturn(mockResult);
 
         // when & then
-        mockMvc.perform(get("/api/users/search")
+        mockMvc.perform(get("/users/search")
                         .param("keyword", keyword)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -64,7 +63,7 @@ class UserSearchControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/users/search/page 페이징 검색 성공")
+    @DisplayName("GET /users/search/page 페이징 검색 성공")
     void searchPaged_success() throws Exception {
         // given
         String keyword = "dev";
@@ -82,7 +81,7 @@ class UserSearchControllerTest {
         given(searchService.search(keyword, page, size)).willReturn(pageResponse);
 
         // when & then
-        mockMvc.perform(get("/api/users/search/page")
+        mockMvc.perform(get("/users/search/page")
                         .param("keyword", keyword)
                         .param("page", String.valueOf(page))
                         .param("size", String.valueOf(size))

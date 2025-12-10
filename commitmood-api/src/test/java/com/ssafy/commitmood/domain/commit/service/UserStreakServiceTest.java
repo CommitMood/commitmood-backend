@@ -1,5 +1,6 @@
 package com.ssafy.commitmood.domain.commit.service;
 
+import com.ssafy.commitmood.domain.commit.common.DateOptionsEnum;
 import com.ssafy.commitmood.domain.commit.dto.DailyCommitCountDto;
 import com.ssafy.commitmood.domain.commit.dto.response.UserStreakResponse;
 import com.ssafy.commitmood.domain.commit.repository.UserStreakMapper;
@@ -16,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -36,7 +36,6 @@ public class UserStreakServiceTest {
     @DisplayName("주간 스트릭을 조회한다.")
     void getUserStreak_Week() {
         Long userAccountId = 1L;
-        String option = "week";
         LocalDate today = LocalDate.now();
 
         List<DailyCommitCountDto> dailyCommitCountDtoList = Arrays.asList(
@@ -53,7 +52,7 @@ public class UserStreakServiceTest {
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)
         )).willReturn(3);
 
-        UserStreakResponse response = userStreakService.getUserStreak(userAccountId, option);
+        UserStreakResponse response = userStreakService.getUserStreak(userAccountId, DateOptionsEnum.week);
 
         assertThat(response).isNotNull();
         assertThat(response.currentStreak()).isEqualTo(3);
@@ -72,7 +71,6 @@ public class UserStreakServiceTest {
     @DisplayName("월간 스트릭을 조회한다.")
     void getUserStreak_Month() {
         Long userAccountId = 1L;
-        String option = "month";
 
         given(userStreakMapper.findDailyCommitCounts(
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)
@@ -81,7 +79,7 @@ public class UserStreakServiceTest {
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)
         )).willReturn(0);
 
-        UserStreakResponse response = userStreakService.getUserStreak(userAccountId, option);
+        UserStreakResponse response = userStreakService.getUserStreak(userAccountId, DateOptionsEnum.month);
 
         assertThat(response).isNotNull();
         assertThat(response.currentStreak()).isEqualTo(0);
@@ -96,7 +94,6 @@ public class UserStreakServiceTest {
     @DisplayName("연간 스트릭을 조회한다")
     void getUserStreak_Year() {
         Long userAccountId = 1L;
-        String option = "year";
         LocalDate today = LocalDate.now();
 
         // 3일 연속 스트릭
@@ -113,7 +110,7 @@ public class UserStreakServiceTest {
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(5);
 
-        UserStreakResponse response = userStreakService.getUserStreak(userAccountId, option);
+        UserStreakResponse response = userStreakService.getUserStreak(userAccountId, DateOptionsEnum.year);
 
         assertThat(response).isNotNull();
         assertThat(response.longestStreak()).isEqualTo(3);
@@ -124,21 +121,9 @@ public class UserStreakServiceTest {
     }
 
     @Test
-    @DisplayName("유효하지 않은 옵션으로 조회시 예외를 발생시킨다")
-    void getUserStreak_InvalidOption() {
-        Long userAccountId = 1L;
-        String invalidOption = "invalid";
-
-        assertThatThrownBy(() -> userStreakService.getUserStreak(userAccountId, invalidOption))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("유효하지 않은 옵션입니다: " + invalidOption);
-    }
-
-    @Test
     @DisplayName("현재 스트릭 계산 - 오늘 커밋이 없으면 어제부터 계산한다")
     void calculateCurrentStreak_NoTodayCommit() {
         Long userAccountId = 1L;
-        String option = "week";
         LocalDate today = LocalDate.now();
 
         List<DailyCommitCountDto> dailyCommits = Arrays.asList(
@@ -154,7 +139,7 @@ public class UserStreakServiceTest {
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(3);
 
-        UserStreakResponse response = userStreakService.getUserStreak(userAccountId, option);
+        UserStreakResponse response = userStreakService.getUserStreak(userAccountId, DateOptionsEnum.week);
 
         assertThat(response.currentStreak()).isEqualTo(3);
     }
@@ -163,7 +148,6 @@ public class UserStreakServiceTest {
     @DisplayName("최장 스트릭 계산 - 여러 연속 구간 중 최장을 찾는다")
     void calculateLongestStreak_MultipleStreaks() {
         Long userAccountId = 1L;
-        String option = "month";
         LocalDate today = LocalDate.now();
 
         // 2일, 5일, 3일 연속 스트릭 -> 5일이 정답임
@@ -189,7 +173,7 @@ public class UserStreakServiceTest {
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(10);
 
-        UserStreakResponse response = userStreakService.getUserStreak(userAccountId, option);
+        UserStreakResponse response = userStreakService.getUserStreak(userAccountId, DateOptionsEnum.month);
 
         assertThat(response.longestStreak()).isEqualTo(5); // 5일이 최장 스트릭
     }

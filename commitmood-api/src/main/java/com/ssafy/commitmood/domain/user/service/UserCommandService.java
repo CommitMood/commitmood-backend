@@ -1,13 +1,13 @@
 package com.ssafy.commitmood.domain.user.service;
 
+import com.ssafy.commitmood.common.exception.NotFoundException;
 import com.ssafy.commitmood.domain.user.dto.request.GithubProfileUpdateRequest;
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
 import com.ssafy.commitmood.domain.user.repository.UserAccountRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -15,10 +15,10 @@ import java.time.LocalDateTime;
 public class UserCommandService {
 
     private final UserAccountRepository repository;
-    private final UserQueryService queryService;
 
     public void updateUserProfileFromGithub(Long userId, GithubProfileUpdateRequest request) {
-        UserAccount user = queryService.getEntityById(userId);
+        UserAccount user = repository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found. id=" + userId));
 
         user.updateProfile(
                 request.githubEmail(),
@@ -26,16 +26,20 @@ public class UserCommandService {
                 request.githubName()
         );
 
-        repository.save(user);
+        repository.update(user);
     }
 
     public void updateLastSyncedAt(Long userId, LocalDateTime now) {
-        queryService.getEntityById(userId);
+        repository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found. id=" + userId));
+
         repository.updateLastSyncedAt(userId, now);
     }
 
     public void deleteUser(Long userId) {
-        queryService.getEntityById(userId);
+        repository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found. id=" + userId));
+
         repository.deleteById(userId);
     }
 }

@@ -1,5 +1,12 @@
 package com.ssafy.commitmood.domain.user.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.then;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.commitmood.domain.user.dto.request.GithubProfileUpdateRequest;
 import com.ssafy.commitmood.domain.user.service.UserCommandService;
@@ -13,13 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.then;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class UserCommandControllerTest {
@@ -51,7 +51,7 @@ class UserCommandControllerTest {
         );
 
         // when & then
-        mockMvc.perform(patch("/api/users/{id}/profile", userId)
+        mockMvc.perform(patch("/users/{id}/github/profile", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
@@ -61,14 +61,14 @@ class UserCommandControllerTest {
     }
 
     @Test
-    @DisplayName("사용자 삭제 API는 200 또는 204 성공 코드를 반환해야 한다")
+    @DisplayName("사용자 삭제 API는 204 No Content를 반환해야 한다")
     void deleteUser_success() throws Exception {
         // given
         Long userId = 10L;
 
         // when & then
-        mockMvc.perform(delete("/api/users/{id}", userId))
-                .andExpect(status().isOk());
+        mockMvc.perform(delete("/users/{id}", userId))
+                .andExpect(status().isNoContent());
 
         then(userCommandService).should().deleteUser(eq(userId));
     }
