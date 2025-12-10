@@ -41,18 +41,53 @@
         WHERE id = #{id}
     </select>
 
-    <!-- Find by GitHub User ID -->
-    <select id="findByGithubUserId" resultMap="UserAccountResultMap">
+    <!-- ================================
+     🔹 단건 조회 (기존 findByPrefix)
+     prefix 기준 첫 번째 결과만 반환
+    ================================ -->
+    <select id="findByPrefixOne" resultMap="UserAccountResultMap">
         SELECT *
         FROM user_account
-        WHERE github_user_id = #{githubUserId}
+        <where>
+            <if test="condition.email != null and condition.email != ''">
+                github_email LIKE CONCAT(#{condition.email}, '%')
+            </if>
+            <if test="condition.githubLogin != null and condition.githubLogin != ''">
+                github_login LIKE CONCAT(#{condition.githubLogin}, '%')
+            </if>
+            <if test="condition.name != null and condition.name != ''">
+                github_name LIKE CONCAT(#{condition.name}, '%')
+            </if>
+            <!-- default → name prefix 검색 / name 없으면 전체 -->
+            <if test="condition.email == null
+               and condition.githubLogin == null
+               and condition.name == null">
+                github_name LIKE '%'
+            </if>
+        </where>
+        LIMIT 1
     </select>
 
-    <!-- Find by GitHub Login -->
-    <select id="findByGithubLogin" resultMap="UserAccountResultMap">
+
+    <!-- ================================
+         🔹 prefix 기반 전체 목록 조회
+         확장 시 사용 (검색 API로 연결)
+    ================================ -->
+    <select id="findAllByPrefix" resultMap="UserAccountResultMap">
         SELECT *
         FROM user_account
-        WHERE github_login = #{githubLogin}
+        <where>
+            <if test="condition.email != null and condition.email != ''">
+                github_email LIKE CONCAT(#{condition.email}, '%')
+            </if>
+            <if test="condition.githubLogin != null and condition.githubLogin != ''">
+                github_login LIKE CONCAT(#{condition.githubLogin}, '%')
+            </if>
+            <if test="condition.name != null and condition.name != ''">
+                github_name LIKE CONCAT(#{condition.name}, '%')
+            </if>
+        </where>
+        ORDER BY github_login ASC
     </select>
 
     <!-- Search by Login (LIKE 검색) -->

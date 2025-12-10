@@ -1,12 +1,12 @@
 package com.ssafy.commitmood.domain.user.mapper;
 
+import com.ssafy.commitmood.domain.user.dto.request.UserAccountQueryCondition;
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserAccountMapper {
@@ -15,10 +15,13 @@ public interface UserAccountMapper {
 
     Optional<UserAccount> findById(@Param("id") Long id);
 
-    Optional<UserAccount> findByGithubUserId(@Param("githubUserId") Long githubUserId);
+    /* 단건 prefix 조회 (LIMIT 1) */
+    Optional<UserAccount> findByPrefixOne(@Param("condition") UserAccountQueryCondition condition);
 
-    Optional<UserAccount> findByGithubLogin(@Param("githubLogin") String githubLogin);
+    /* 전체 prefix 조회 (목록 반환) */
+    List<UserAccount> findAllByPrefix(@Param("condition") UserAccountQueryCondition condition);
 
+    /* LIKE 기반 검색 */
     List<UserAccount> searchByLoginLike(@Param("query") String query);
 
     List<UserAccount> searchByLoginPaged(
