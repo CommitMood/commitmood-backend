@@ -40,7 +40,7 @@ class GithubRepoControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    // 샘플 DTO 생성
+    // sample DTO
     private GithubRepoResponse sample(long id, long userId) {
         return new GithubRepoResponse(
                 id, userId, 1000L + id,
@@ -54,9 +54,9 @@ class GithubRepoControllerTest {
         );
     }
 
-    // =====================================
+    // =====================================================
     // 1. Repo 단건 조회
-    // =====================================
+    // =====================================================
     @Test
     @DisplayName("GET /repos/{repoId} → 단건 조회 성공")
     void getRepo_success() throws Exception {
@@ -75,9 +75,9 @@ class GithubRepoControllerTest {
         then(service).should().getRepo(repoId);
     }
 
-    // =====================================
+    // =====================================================
     // 2. 특정 사용자 Repo 목록 조회
-    // =====================================
+    // =====================================================
     @Test
     @DisplayName("GET /users/{userId}/repos → 목록 조회 OK")
     void getUserRepos_success() throws Exception {
@@ -104,9 +104,9 @@ class GithubRepoControllerTest {
         then(service).should().getUserRepos(userId);
     }
 
-    // =====================================
-    // 3_A. 검색 기본 (page 없음 → ListResponse)
-    // =====================================
+    // =====================================================
+    // 3-A. 검색 기본 (비페이징 → ListResponse)
+    // =====================================================
     @Test
     @DisplayName("GET /repos/search?keyword=xx → List 검색 성공")
     void search_basic_success() throws Exception {
@@ -135,11 +135,11 @@ class GithubRepoControllerTest {
         then(service).should().search(keyword);
     }
 
-    // =====================================
-    // 3_B. 검색 + 페이징 (page,size 포함 → PageResponse)
-    // =====================================
+    // =====================================================
+    // 3-B. 검색 + 페이징 (PageResponse)
+    // =====================================================
     @Test
-    @DisplayName("GET /repos/search?page=&size= → PageResponse 성공")
+    @DisplayName("GET /repos/search/page?keyword=xx&page=1&size=10 → PageResponse 성공")
     void search_paged_success() throws Exception {
         String keyword = "commit";
 
@@ -152,26 +152,30 @@ class GithubRepoControllerTest {
 
         given(service.searchPaged(keyword, 1, 10)).willReturn(response);
 
-        mockMvc.perform(get("/repos/search")
+        mockMvc.perform(get("/repos/search/page")
                         .param("keyword", keyword)
                         .param("page", "1")
                         .param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.page").value(1))
+                .andExpect(jsonPath("$.size").value(10))
+                .andExpect(jsonPath("$.totalCount").value(30))
                 .andExpect(jsonPath("$.totalPages").value(3));
 
         then(service).should().searchPaged(keyword, 1, 10);
     }
 
-    // =====================================
-    // 4. TODO Commit 조회 (현재는 호출만 확인)
-    // =====================================
+    // =====================================================
+    // 4. Commit 조회 (미구현 → 호출 체크만)
+    // =====================================================
     @Test
-    @DisplayName("GET /repos/{id}/commits → 미구현 호출 확인")
+    @DisplayName("GET /repos/{repoId}/commits → 호출만 확인")
     void commits_call_success() throws Exception {
         long repoId = 9L;
+
         mockMvc.perform(get("/repos/{repoId}/commits", repoId))
-                .andExpect(status().isOk()); // 현재 UnsupportedOperationException → 응답 200 보장 X
+                .andExpect(status().isOk());
 
         then(service).should().getCommitsByRepo(repoId);
     }
