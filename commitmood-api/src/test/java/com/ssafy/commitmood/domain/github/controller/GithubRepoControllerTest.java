@@ -1,11 +1,18 @@
 package com.ssafy.commitmood.domain.github.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.ssafy.commitmood.common.dto.response.PageResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoListResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoResponse;
 import com.ssafy.commitmood.domain.github.entity.GithubRepo;
 import com.ssafy.commitmood.domain.github.service.GithubRepoQueryService;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,15 +22,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -36,8 +34,6 @@ class GithubRepoControllerTest {
 
     @InjectMocks
     GithubRepoController controller;
-
-    ObjectMapper om = new ObjectMapper();
 
     @BeforeEach
     void init() {
