@@ -19,6 +19,12 @@ public class UserStreakService {
     private final UserStreakMapper userStreakMapper;
 
     public UserStreakResponse getUserStreak(Long userAccountId, DateOptionsEnum option) {
+        try {
+            DateOptionsEnum.valueOf(option.name());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("유효하지 않은 옵션입니다: " + option);
+        }
+
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = calculateStartDate(endDate, option);
 
@@ -50,7 +56,6 @@ public class UserStreakService {
             case week -> endDate.minusWeeks(1);
             case month -> endDate.minusMonths(1);
             case year -> endDate.minusYears(1);
-            default -> throw new IllegalArgumentException("유효하지 않은 옵션입니다: " + option);
         };
     }
 
