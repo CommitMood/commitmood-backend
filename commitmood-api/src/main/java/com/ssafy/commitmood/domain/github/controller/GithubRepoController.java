@@ -5,7 +5,9 @@ import com.ssafy.commitmood.domain.github.dto.response.GithubRepoListResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoResponse;
 import com.ssafy.commitmood.domain.github.service.GithubRepoQueryService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,68 +22,77 @@ public class GithubRepoController {
 
     private final GithubRepoQueryService githubRepoQueryService;
 
-    @Operation(
-            summary = "특정 사용자의 GitHub Repo 리스트 조회",
-            description = "userId 기반으로 GitHub Repo 리스트를 조회한다."
+    @Operation(summary = "특정 사용자의 GitHub Repo 리스트 조회",
+            description = "userId 기반 Repo 리스트 조회",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공",
+                            content = @Content(schema = @Schema(implementation = GithubRepoListResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음"),
+                    @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+            }
     )
     @GetMapping("/users/{userId}/repos")
-    public GithubRepoListResponse getUserRepos(
-            @Parameter(description = "내부 사용자 ID", example = "1") @PathVariable Long userId
-    ) {
+    public GithubRepoListResponse getUserRepos(@PathVariable Long userId) {
         return githubRepoQueryService.getUserRepos(userId);
     }
 
-    @Operation(
-            summary = "GitHub Repo 단건 조회",
-            description = "repoId 기반으로 특정 GitHub Repo 정보를 조회한다."
+    @Operation(summary = "GitHub Repo 단건 조회",
+            description = "repoId 기반 Repo 상세 조회",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공",
+                            content = @Content(schema = @Schema(implementation = GithubRepoResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "Repo가 존재하지 않음"),
+                    @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+            }
     )
     @GetMapping("/repos/{repoId}")
-    public GithubRepoResponse getRepo(
-            @Parameter(description = "Repo ID", example = "130")
-            @PathVariable Long repoId
-    ) {
+    public GithubRepoResponse getRepo(@PathVariable Long repoId) {
         return githubRepoQueryService.getRepo(repoId);
     }
 
-    @Operation(
-            summary = "GitHub Repo 검색 (비페이징)",
-            description = "keyword 기반으로 GitHub Repo 리스트를 조회한다."
+    @Operation(summary = "GitHub Repo 검색 (비페이징)",
+            description = "keyword 기반 Repo 리스트 검색",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "검색 성공",
+                            content = @Content(schema = @Schema(implementation = GithubRepoListResponse.class))),
+                    @ApiResponse(responseCode = "400", description = "keyword 파라미터 오류"),
+                    @ApiResponse(responseCode = "500", description = "서버 오류")
+            }
     )
     @GetMapping("/repos/search")
-    public GithubRepoListResponse searchRepos(
-            @Parameter(description = "검색 keyword", example = "spring")
-            @RequestParam String keyword
-    ) {
+    public GithubRepoListResponse searchRepos(@RequestParam String keyword) {
         return githubRepoQueryService.search(keyword);
     }
 
-    @Operation(
-            summary = "GitHub Repo 검색 (페이징)",
-            description = "keyword 기반으로 GitHub Repo를 페이징 조회한다."
+    @Operation(summary = "GitHub Repo 검색 (페이징)",
+            description = "keyword + page/size 기반 검색",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "검색 성공",
+                            content = @Content(schema = @Schema(implementation = PageResponse.class))),
+                    @ApiResponse(responseCode = "400", description = "페이징 파라미터 오류"),
+                    @ApiResponse(responseCode = "500", description = "서버 오류")
+            }
     )
     @GetMapping("/repos/search/page")
     public PageResponse<GithubRepoResponse> searchReposPaged(
-            @Parameter(description = "검색 keyword", example = "spring")
             @RequestParam String keyword,
-
-            @Parameter(description = "페이지 번호(1부터 시작)", example = "1")
             @RequestParam(defaultValue = "1") int page,
-
-            @Parameter(description = "페이지 사이즈", example = "10")
             @RequestParam(defaultValue = "10") int size
     ) {
         return githubRepoQueryService.searchPaged(keyword, page, size);
     }
 
-    @Operation(
-            summary = "GitHub Repo Commit 조회 (미구현)",
-            description = "repoId 기반 Commit 리스트 조회 API (예정)"
+    @Operation(summary = "GitHub Repo Commit 조회 (미구현)",
+            description = "Repo 기반 Commit 조회 예정",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공"),
+                    @ApiResponse(responseCode = "404", description = "Repo가 존재하지 않음"),
+                    @ApiResponse(responseCode = "501", description = "기능 미구현"),
+                    @ApiResponse(responseCode = "500", description = "서버 오류")
+            }
     )
     @GetMapping("/repos/{repoId}/commits")
-    public Object getCommitsByRepo(
-            @Parameter(description = "Repo ID", example = "130")
-            @PathVariable Long repoId
-    ) {
+    public Object getCommitsByRepo(@PathVariable Long repoId) {
         return githubRepoQueryService.getCommitsByRepo(repoId);
     }
 }
