@@ -11,6 +11,16 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
+server:
+  servlet:
+    context-path: /api
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
 logging:
   level:
     com.ssafy.commitmood: DEBUG
