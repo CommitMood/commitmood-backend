@@ -1,4 +1,4 @@
-package com.ssafy.commitmood.domain.commit.repository;
+package com.ssafy.commitmood.domain.commit.mapper;
 
 import com.ssafy.commitmood.domain.commit.dto.UserFlaggedStatsDto;
 import com.ssafy.commitmood.domain.commit.dto.UserRankingDto;
@@ -8,6 +8,7 @@ import com.ssafy.commitmood.domain.commit.entity.CommitAnalysis;
 import com.ssafy.commitmood.domain.commit.entity.CommitLog;
 import com.ssafy.commitmood.domain.commit.entity.FlaggedToken;
 import com.ssafy.commitmood.domain.github.entity.GithubRepo;
+import com.ssafy.commitmood.domain.github.mapper.GithubRepoMapper;
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
 import com.ssafy.commitmood.domain.user.mapper.UserAccountMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -28,8 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayName("RankingMapper 테스트")
 @MapperScan(basePackages = {
-        "com.ssafy.commitmood.domain.commit.repository",
+        "com.ssafy.commitmood.domain.commit.mapper",
         "com.ssafy.commitmood.domain.user.mapper",
+        "com.ssafy.commitmood.domain.github.mapper",
 })
 @ActiveProfiles("test")
 class RankingMapperTest {
@@ -41,7 +43,7 @@ class RankingMapperTest {
     private UserAccountMapper userAccountMapper;
 
     @Autowired
-    private GithubRepoInsertMapper githubRepoInsertMapper;
+    private GithubRepoMapper githubRepoMapper;
 
     @Autowired
     private CommitLogMapper commitLogMapper;
@@ -234,7 +236,7 @@ class RankingMapperTest {
 
         // then
         assertThat(result).hasSize(2);
-        assertThat(result.get(0).getToken()).isEqualTo("fuck");
+        assertThat(result.getFirst().getToken()).isEqualTo("fuck");
         assertThat(result.get(0).getOccurrenceCount()).isEqualTo(2L); // 2번 사용
         assertThat(result.get(0).getTotalWeight()).isEqualTo(10L); // 5 + 5
         assertThat(result.get(1).getToken()).isEqualTo("damn");
@@ -285,7 +287,7 @@ class RankingMapperTest {
         // then
         assertThat(page1).hasSize(2);
         assertThat(page2).hasSize(2);
-        assertThat(page1.get(0).getGithubLogin()).isNotEqualTo(page2.get(0).getGithubLogin());
+        assertThat(page1.getFirst().getGithubLogin()).isNotEqualTo(page2.get(0).getGithubLogin());
     }
 
     // Helper methods
@@ -312,7 +314,7 @@ class RankingMapperTest {
                 "https://github.com/owner/" + repoName,
                 false
         );
-        githubRepoInsertMapper.insert(repo);
+        githubRepoMapper.insert(repo);
         return repo;
     }
 

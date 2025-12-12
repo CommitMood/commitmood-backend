@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.ssafy.commitmood.domain.commit.repository.UserStreakMapper">
+<mapper namespace="com.ssafy.commitmood.domain.commit.mapper.UserStreakMapper">
 
     <!-- DailyCommitCountDto ResultMap -->
     <resultMap id="dailyCommitCountResultMap"
@@ -13,9 +13,8 @@
 
     <!-- 특정 기간 동안 사용자의 일별 커밋 수 조회 -->
     <select id="findDailyCommitCounts" resultMap="dailyCommitCountResultMap">
-        SELECT
-            CAST(committed_at AS DATE) as commit_date,
-            COUNT(*) as commit_count
+        SELECT CAST(committed_at AS DATE) as commit_date,
+               COUNT(*)                   as commit_count
         FROM commit_log
         WHERE user_account_id = #{userAccountId}
           AND CAST(committed_at AS DATE) BETWEEN #{startDate} AND #{endDate}

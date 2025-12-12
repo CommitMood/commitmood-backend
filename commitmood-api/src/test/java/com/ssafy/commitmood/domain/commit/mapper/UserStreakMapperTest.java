@@ -1,10 +1,16 @@
-package com.ssafy.commitmood.domain.commit.repository;
+package com.ssafy.commitmood.domain.commit.mapper;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ssafy.commitmood.domain.commit.dto.DailyCommitCountDto;
 import com.ssafy.commitmood.domain.commit.entity.CommitLog;
 import com.ssafy.commitmood.domain.github.entity.GithubRepo;
+import com.ssafy.commitmood.domain.github.mapper.GithubRepoMapper;
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
 import com.ssafy.commitmood.domain.user.mapper.UserAccountMapper;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.annotation.MapperScan;
@@ -13,18 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 @MapperScan(basePackages = {
-        "com.ssafy.commitmood.domain.commit.repository",
+        "com.ssafy.commitmood.domain.commit.mapper",
         "com.ssafy.commitmood.domain.user.mapper",
+        "com.ssafy.commitmood.domain.github.mapper",
 })
 @DisplayName("UserStreakMapper 테스트")
 class UserStreakMapperTest {
@@ -36,7 +37,7 @@ class UserStreakMapperTest {
     private UserAccountMapper userAccountMapper;
 
     @Autowired
-    private GithubRepoInsertMapper githubRepoInsertMapper;
+    private GithubRepoMapper githubRepoMapper;
 
     @Autowired
     private CommitLogMapper commitLogMapper;
@@ -180,7 +181,7 @@ class UserStreakMapperTest {
                 "https://github.com/owner/" + repoName,
                 false
         );
-        githubRepoInsertMapper.insert(repo);
+        githubRepoMapper.insert(repo);
         return repo;
     }
 

@@ -3,20 +3,19 @@ package com.ssafy.commitmood.domain.commit.service;
 import com.ssafy.commitmood.domain.commit.common.DateOptionsEnum;
 import com.ssafy.commitmood.domain.commit.dto.DailyCommitCountDto;
 import com.ssafy.commitmood.domain.commit.dto.response.UserStreakResponse;
-import com.ssafy.commitmood.domain.commit.repository.UserStreakMapper;
+import com.ssafy.commitmood.domain.commit.repository.UserStreakRepository;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserStreakService {
 
-    private final UserStreakMapper userStreakMapper;
+    private final UserStreakRepository userStreakRepository;
 
     public UserStreakResponse getUserStreak(Long userAccountId, DateOptionsEnum option) {
         try {
@@ -28,11 +27,11 @@ public class UserStreakService {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = calculateStartDate(endDate, option);
 
-        List<DailyCommitCountDto> dailyCommits = userStreakMapper.findDailyCommitCounts(
+        List<DailyCommitCountDto> dailyCommits = userStreakRepository.findDailyCommitCounts(
                 userAccountId, startDate, endDate
         );
 
-        Integer totalCommitDays = userStreakMapper.countTotalCommitDays(
+        Integer totalCommitDays = userStreakRepository.countTotalCommitDays(
                 userAccountId, startDate, endDate
         );
 
@@ -60,8 +59,7 @@ public class UserStreakService {
     }
 
     /**
-     * 현재 연속 커밋 일수 계산
-     * 오늘 또는 어제부터 시작하여 연속된 커밋 일수를 계산
+     * 현재 연속 커밋 일수 계산 오늘 또는 어제부터 시작하여 연속된 커밋 일수를 계산
      */
     private Integer calculateCurrentStreak(List<DailyCommitCountDto> dailyCommits, LocalDate endDate) {
         if (dailyCommits.isEmpty()) {

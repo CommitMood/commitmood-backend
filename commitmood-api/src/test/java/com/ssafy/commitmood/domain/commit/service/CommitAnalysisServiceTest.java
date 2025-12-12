@@ -1,10 +1,20 @@
 package com.ssafy.commitmood.domain.commit.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+
 import com.ssafy.commitmood.domain.commit.dto.response.CommitAnalysisResponse;
 import com.ssafy.commitmood.domain.commit.dto.response.FlaggedTokenResponse;
 import com.ssafy.commitmood.domain.commit.entity.CommitAnalysis;
 import com.ssafy.commitmood.domain.commit.entity.FlaggedToken;
-import com.ssafy.commitmood.domain.commit.repository.CommitAnalysisMapper;
+import com.ssafy.commitmood.domain.commit.repository.CommitAnalysisRepository;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,23 +22,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CommitAnalysisService 테스트")
-public class CommitAnalysisServiceTest {
+class CommitAnalysisServiceTest {
 
     @Mock
-    private CommitAnalysisMapper commitAnalysisMapper;
+    private CommitAnalysisRepository commitAnalysisRepository;
 
     @InjectMocks
     private CommitAnalysisService commitAnalysisService;
@@ -47,7 +46,7 @@ public class CommitAnalysisServiceTest {
                 BigDecimal.valueOf(-0.5)
         );
 
-        given(commitAnalysisMapper.findByCommitLogId(commitLogId))
+        given(commitAnalysisRepository.findByCommitLogId(commitLogId))
                 .willReturn(Optional.of(analysis));
 
         CommitAnalysisResponse response = commitAnalysisService.getCommitAnalysis(commitLogId);
@@ -59,21 +58,21 @@ public class CommitAnalysisServiceTest {
         assertThat(response.sentiment()).isEqualTo("NEGATIVE");
         assertThat(response.sentimentScore()).isEqualByComparingTo(BigDecimal.valueOf(-0.5));
 
-        verify(commitAnalysisMapper).findByCommitLogId(commitLogId);
+        verify(commitAnalysisRepository).findByCommitLogId(commitLogId);
     }
 
     @Test
     @DisplayName("존재하지 않는 커밋 분석 정보 조회시 예외를 발생시킨다.")
     void getCommitAnalysis_NotFound() {
         Long commitLogId = 999L;
-        given(commitAnalysisMapper.findByCommitLogId(commitLogId))
+        given(commitAnalysisRepository.findByCommitLogId(commitLogId))
                 .willReturn(Optional.empty());
 
         assertThatThrownBy(() -> commitAnalysisService.getCommitAnalysis(commitLogId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("커밋 분석 정보를 찾을 수 없습니다. commitLogId: " + commitLogId);
 
-        verify(commitAnalysisMapper).findByCommitLogId(commitLogId);
+        verify(commitAnalysisRepository).findByCommitLogId(commitLogId);
     }
 
     @Test
@@ -84,8 +83,7 @@ public class CommitAnalysisServiceTest {
         FlaggedToken token2 = FlaggedToken.create(commitLogId, "!!!", FlaggedToken.TokenType.EMPHASIS, 5L);
         FlaggedToken token3 = FlaggedToken.create(commitLogId, "😊", FlaggedToken.TokenType.EMOJI, 3L);
 
-        // 그 아래 mapper의 메서드를 모킹해 특정 반환값을 설정
-        given(commitAnalysisMapper.findFlaggedTokensByCommitLogId(commitLogId))
+        given(commitAnalysisRepository.findFlaggedTokens(commitLogId))
                 .willReturn(Arrays.asList(token1, token2, token3));
 
         List<FlaggedTokenResponse> responses = commitAnalysisService.getFlaggedTokens(commitLogId);
@@ -101,19 +99,19 @@ public class CommitAnalysisServiceTest {
         assertThat(responses.get(2).tokenType()).isEqualTo("EMOJI");
         assertThat(responses.get(2).weight()).isEqualTo(3L);
 
-        verify(commitAnalysisMapper).findFlaggedTokensByCommitLogId(commitLogId);
+        verify(commitAnalysisRepository).findFlaggedTokens(commitLogId);
     }
 
     @Test
     @DisplayName("플래그된 토큰이 없으면 빈 리스트를 반환한다.")
     void getFlaggedTokens_Empty() {
         Long commitLogId = 1L;
-        given(commitAnalysisMapper.findFlaggedTokensByCommitLogId(commitLogId))
+        given(commitAnalysisRepository.findFlaggedTokens(commitLogId))
                 .willReturn(Collections.emptyList());
 
         List<FlaggedTokenResponse> responses = commitAnalysisService.getFlaggedTokens(commitLogId);
 
         assertThat(responses).isEmpty();
-        verify(commitAnalysisMapper).findFlaggedTokensByCommitLogId(commitLogId);
+        verify(commitAnalysisRepository).findFlaggedTokens(commitLogId);
     }
 }
