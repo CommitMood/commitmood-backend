@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.ssafy.commitmood.common.dto.response.PageResponse;
+import com.ssafy.commitmood.domain.github.dto.response.GithubCommitResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoListResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoResponse;
 import com.ssafy.commitmood.domain.github.entity.GithubRepo;
@@ -176,6 +177,57 @@ class GithubRepoControllerTest {
 
         mockMvc.perform(get("/repos/{repoId}/commits", repoId))
                 .andExpect(status().isOk());
+
+        then(service).should().getCommitsByRepo(repoId);
+    }
+
+    // =====================================================
+    // 5. Commit 조회 (실제 구현 버전) - CommitResponse 목록 검증
+    // =====================================================
+    @Test
+    @DisplayName("GET /repos/{repoId}/commits → Commit 목록 조회 성공")
+    void getCommitsByRepo_success() throws Exception {
+        long repoId = 5L;
+
+        GithubCommitResponse c1 = new GithubCommitResponse(
+                1L,
+                repoId,
+                10L,
+                "a".repeat(40),
+                "feat: initial commit",
+                LocalDateTime.of(2025, 1, 1, 10, 0),
+                5,
+                0,
+                5
+        );
+
+        GithubCommitResponse c2 = new GithubCommitResponse(
+                2L,
+                repoId,
+                10L,
+                "b".repeat(40),
+                "fix: apply hotfix",
+                LocalDateTime.of(2025, 1, 2, 12, 30),
+                3,
+                1,
+                4
+        );
+
+        // mock service return
+        given(service.getCommitsByRepo(repoId))
+                .willReturn(List.of(c1, c2));
+
+        mockMvc.perform(get("/repos/{repoId}/commits", repoId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].repoId").value(repoId))
+                .andExpect(jsonPath("$[0].sha").value("a".repeat(40)))
+                .andExpect(jsonPath("$[0].message").value("feat: initial commit"))
+                .andExpect(jsonPath("$[0].additions").value(5))
+                .andExpect(jsonPath("$[0].totalChanges").value(5))
+                .andExpect(jsonPath("$[1].sha").value("b".repeat(40)))
+                .andExpect(jsonPath("$[1].totalChanges").value(4));
 
         then(service).should().getCommitsByRepo(repoId);
     }

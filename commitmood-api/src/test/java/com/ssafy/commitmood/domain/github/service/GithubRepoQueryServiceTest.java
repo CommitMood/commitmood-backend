@@ -1,21 +1,26 @@
 package com.ssafy.commitmood.domain.github.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.ssafy.commitmood.common.dto.response.PageResponse;
+import com.ssafy.commitmood.domain.commit.entity.CommitLog;
+import com.ssafy.commitmood.domain.commit.repository.CommitLogMapper;
+import com.ssafy.commitmood.domain.github.dto.response.GithubCommitResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoListResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoResponse;
 import com.ssafy.commitmood.domain.github.entity.GithubRepo;
 import com.ssafy.commitmood.domain.github.repository.GithubRepoRepository;
 import com.ssafy.commitmood.domain.user.entity.UserAccount;
 import com.ssafy.commitmood.domain.user.repository.UserAccountRepository;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -30,6 +35,9 @@ class GithubRepoQueryServiceTest {
 
     @Autowired
     UserAccountRepository userRepository;
+
+    @Autowired
+    CommitLogMapper commitLogMapper;
 
     private Long createUser(String login) {
         UserAccount user = UserAccount.create(
@@ -140,5 +148,52 @@ class GithubRepoQueryServiceTest {
         assertThat(result.totalPages()).isEqualTo(2);
         assertThat(result.page()).isEqualTo(2);
         assertThat(result.hasNext()).isFalse();
+    }
+
+    @Test
+    @DisplayName("특정 Repo의 Commit 목록을 조회할 수 있다")
+    void getCommitsByRepo() {
+        // ---------------------------------------------
+        // GIVEN: User + Repo + CommitLog 구성
+        // ---------------------------------------------
+
+        Long userId = createUser("commitUser");
+        GithubRepo repo = createRepo(userId, 1001L, "commitmood-api");
+
+        String sha = "a".repeat(40);
+
+        CommitLog commit = CommitLog.create(
+                repo.getId(),
+                userId,
+                sha,
+                LocalDateTime.now(),
+                "feat: add new api",
+                "https://github.com/devys/commitmood-api/commit/" + sha,
+                10L,
+                2L,
+                12L,
+                3L
+        );
+
+        commitLogMapper.insert(commit);
+
+        // ---------------------------------------------
+        // WHEN: 서비스에서 getCommitsByRepo 호출
+        // ---------------------------------------------
+        List<GithubCommitResponse> result = repoQueryService.getCommitsByRepo(repo.getId());
+
+        // ---------------------------------------------
+        // THEN: CommitLog → GithubCommitResponse 매핑 확인
+        // ---------------------------------------------
+        assertThat(result).hasSize(1);
+
+        GithubCommitResponse first = result.get(0);
+
+        assertThat(first.id()).isNotNull();
+        assertThat(first.repoId()).isEqualTo(repo.getId());
+        assertThat(first.userAccountId()).isEqualTo(userId);
+        assertThat(first.sha()).isEqualTo(sha);
+        assertThat(first.message()).isEqualTo("feat: add new api");
+        assertThat(first.totalChanges()).isEqualTo(12);
     }
 }
