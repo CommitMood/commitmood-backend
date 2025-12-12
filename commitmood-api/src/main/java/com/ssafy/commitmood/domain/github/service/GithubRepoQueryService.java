@@ -2,7 +2,7 @@ package com.ssafy.commitmood.domain.github.service;
 
 import com.ssafy.commitmood.common.dto.response.PageResponse;
 import com.ssafy.commitmood.domain.commit.entity.CommitLog;
-import com.ssafy.commitmood.domain.commit.mapper.CommitLogMapper;
+import com.ssafy.commitmood.domain.commit.repository.CommitLogRepository;
 import com.ssafy.commitmood.domain.github.dto.response.GithubCommitResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoListResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoResponse;
@@ -19,9 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class GithubRepoQueryService {
 
     private final GithubRepoRepository githubRepoRepository;
-    //    TODO Commit 도메인쪽 repository 구현체/인터페이스 통일 필요
-    //    private final CommitLogRepository commitLogRepository;
-    private final CommitLogMapper commitLogMapper;
+    private final CommitLogRepository commitLogRepository;
 
     public GithubRepoListResponse getUserRepos(Long userAccountId) {
         return GithubRepoListResponse.of(githubRepoRepository.findByUserAccountId(userAccountId));
@@ -51,7 +49,7 @@ public class GithubRepoQueryService {
     }
 
     public List<GithubCommitResponse> getCommitsByRepo(Long repoId) {
-        List<CommitLog> logs = commitLogMapper.findByRepoId(repoId);
+        List<CommitLog> logs = commitLogRepository.findByRepoId(repoId);
 
         return logs.stream()
                 .map(GithubCommitResponse::of)
