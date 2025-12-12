@@ -51,15 +51,14 @@
 
     <!-- 공통 서브쿼리: 사용자별 집계 통계 -->
     <sql id="userStatsSubquery">
-        SELECT
-            ua.id as user_account_id,
-            ua.github_login,
-            ua.github_avatar_url,
-            COUNT(DISTINCT cl.id) as total_commits,
-            COALESCE(SUM(ca.flagged_count), 0) as total_flagged,
-            COALESCE(SUM(ca.swear_count), 0) as total_swear,
-            AVG(ca.sentiment_score) as avg_sentiment_score,
-            MAX(cl.committed_at) as last_commit_at
+        SELECT ua.id                              as user_account_id,
+               ua.github_login,
+               ua.github_avatar_url,
+               COUNT(DISTINCT cl.id)              as total_commits,
+               COALESCE(SUM(ca.flagged_count), 0) as total_flagged,
+               COALESCE(SUM(ca.swear_count), 0)   as total_swear,
+               AVG(ca.sentiment_score)            as avg_sentiment_score,
+               MAX(cl.committed_at)               as last_commit_at
         FROM user_account ua
                  LEFT JOIN commit_log cl ON ua.id = cl.user_account_id
                  LEFT JOIN commit_analysis ca ON cl.id = ca.commit_log_id
@@ -123,48 +122,47 @@
 
     <!-- 특정 사용자의 저장소별 통계 조회 -->
     <select id="findUserRepoStats" resultMap="userRepoStatsResultMap">
-        SELECT
-            gr.github_repo_id,
-            gr.github_repo_name,
-            gr.github_repo_full_name,
-            COUNT(cl.id) as commit_count,
-            COALESCE(SUM(cl.additions), 0) as total_additions,
-            COALESCE(SUM(cl.deletions), 0) as total_deletions,
-            MAX(cl.committed_at) as last_commit_at
+        SELECT gr.github_repo_id,
+               gr.github_repo_name,
+               gr.github_repo_full_name,
+               COUNT(cl.id)                   as commit_count,
+               COALESCE(SUM(cl.additions), 0) as total_additions,
+               COALESCE(SUM(cl.deletions), 0) as total_deletions,
+               MAX(cl.committed_at)           as last_commit_at
         FROM github_repo gr
                  INNER JOIN commit_log cl ON gr.id = cl.github_repo_id
         WHERE cl.user_account_id = #{userAccountId}
         GROUP BY gr.github_repo_id, gr.github_repo_name, gr.github_repo_full_name
         ORDER BY commit_count DESC, last_commit_at DESC
-            LIMIT #{limit} OFFSET #{offset}
+            LIMIT #{limit}
+        OFFSET #{offset}
     </select>
 
     <!-- 특정 사용자의 플래그 토큰 통계 조회 -->
     <select id="findUserFlaggedStats" resultMap="userFlaggedStatsResultMap">
-        SELECT
-            ft.token,
-            ft.token_type,
-            COUNT(*) as occurrence_count,
-            SUM(ft.weight) as total_weight
+        SELECT ft.token,
+               ft.token_type,
+               COUNT(*)       as occurrence_count,
+               SUM(ft.weight) as total_weight
         FROM flagged_token ft
                  INNER JOIN commit_log cl ON ft.commit_log_id = cl.id
         WHERE cl.user_account_id = #{userAccountId}
         GROUP BY ft.token, ft.token_type
         ORDER BY occurrence_count DESC, total_weight DESC
-            LIMIT #{limit} OFFSET #{offset}
+            LIMIT #{limit}
+        OFFSET #{offset}
     </select>
 
     <!-- 특정 사용자의 감정 분석 통계 조회 -->
     <select id="findUserSentimentStats" resultMap="userSentimentStatsResultMap">
-        SELECT
-            SUM(CASE WHEN ca.sentiment = 'POSITIVE' THEN 1 ELSE 0 END) as positive_count,
-            SUM(CASE WHEN ca.sentiment = 'NEUTRAL' THEN 1 ELSE 0 END) as neutral_count,
-            SUM(CASE WHEN ca.sentiment = 'NEGATIVE' THEN 1 ELSE 0 END) as negative_count,
-            AVG(ca.sentiment_score) as avg_sentiment_score,
-            MAX(ca.sentiment_score) as max_sentiment_score,
-            MIN(ca.sentiment_score) as min_sentiment_score
-        FROM commit_analysis ca
-                 INNER JOIN commit_log cl ON ca.commit_log_id = cl.id
+        SELECT COALESCE(SUM(CASE WHEN ca.sentiment = 'POSITIVE' THEN 1 ELSE 0 END), 0) AS positive_count,
+               COALESCE(SUM(CASE WHEN ca.sentiment = 'NEUTRAL' THEN 1 ELSE 0 END), 0)  AS neutral_count,
+               COALESCE(SUM(CASE WHEN ca.sentiment = 'NEGATIVE' THEN 1 ELSE 0 END), 0) AS negative_count,
+               AVG(ca.sentiment_score)                                                 AS avg_sentiment_score,
+               MAX(ca.sentiment_score)                                                 AS max_sentiment_score,
+               MIN(ca.sentiment_score)                                                 AS min_sentiment_score
+        FROM commit_log cl
+                 LEFT JOIN commit_analysis ca ON ca.commit_log_id = cl.id
         WHERE cl.user_account_id = #{userAccountId}
     </select>
 
