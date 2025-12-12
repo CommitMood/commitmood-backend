@@ -1,6 +1,7 @@
 package com.ssafy.commitmood.domain.github.controller;
 
 import com.ssafy.commitmood.common.dto.response.PageResponse;
+import com.ssafy.commitmood.domain.github.dto.response.GithubCommitResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoListResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoResponse;
 import com.ssafy.commitmood.domain.github.service.GithubRepoQueryService;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -82,17 +84,23 @@ public class GithubRepoController {
         return githubRepoQueryService.searchPaged(keyword, page, size);
     }
 
-    @Operation(summary = "GitHub Repo Commit 조회 (미구현)",
-            description = "Repo 기반 Commit 조회 예정",
+    @Operation(
+            summary = "GitHub Repo Commit 조회",
+            description = "repoId 기반 Commit 목록 조회",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공"),
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "조회 성공",
+                            content = @Content(
+                                    schema = @Schema(implementation = GithubCommitResponse.class)
+                            )
+                    ),
                     @ApiResponse(responseCode = "404", description = "Repo가 존재하지 않음"),
-                    @ApiResponse(responseCode = "501", description = "기능 미구현"),
-                    @ApiResponse(responseCode = "500", description = "서버 오류")
+                    @ApiResponse(responseCode = "500", description = "서버 내부 오류")
             }
     )
     @GetMapping("/repos/{repoId}/commits")
-    public Object getCommitsByRepo(@PathVariable Long repoId) {
+    public List<GithubCommitResponse> getCommitsByRepo(@PathVariable Long repoId) {
         return githubRepoQueryService.getCommitsByRepo(repoId);
     }
 }

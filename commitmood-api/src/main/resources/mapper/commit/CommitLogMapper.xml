@@ -4,36 +4,64 @@
 
 <mapper namespace="com.ssafy.commitmood.domain.commit.repository.CommitLogMapper">
 
+    <resultMap id="CommitLogResultMap"
+               type="com.ssafy.commitmood.domain.commit.entity.CommitLog">
+        <id property="id" column="id"/>
+        <result property="githubRepoId" column="github_repo_id"/>
+        <result property="userAccountId" column="user_account_id"/>
+        <result property="githubCommitSha" column="github_commit_sha"/>
+        <result property="committedAt" column="committed_at"/>
+        <result property="message" column="message"/>
+        <result property="additions" column="additions"/>
+        <result property="deletions" column="deletions"/>
+        <result property="totalChanges" column="total_changes"/>
+        <result property="filesChanged" column="files_changed"/>
+    </resultMap>
+
     <!-- 커밋 로그 저장 -->
     <insert id="insert" parameterType="com.ssafy.commitmood.domain.commit.entity.CommitLog"
             useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO commit_log (
-            github_repo_id,
-            user_account_id,
-            github_commit_sha,
-            committed_at,
-            message,
-            html_url,
-            additions,
-            deletions,
-            total_changes,
-            files_changed,
-            created_at,
-            updated_at
-        ) VALUES (
-                     #{githubRepoId},
-                     #{userAccountId},
-                     #{githubCommitSha},
-                     #{committedAt},
-                     #{message},
-                     #{htmlUrl},
-                     #{additions},
-                     #{deletions},
-                     #{totalChanges},
-                     #{filesChanged},
-                     NOW(),
-                     NOW()
-                 )
+        INSERT INTO commit_log (github_repo_id,
+                                user_account_id,
+                                github_commit_sha,
+                                committed_at,
+                                message,
+                                html_url,
+                                additions,
+                                deletions,
+                                total_changes,
+                                files_changed,
+                                created_at,
+                                updated_at)
+        VALUES (#{githubRepoId},
+                #{userAccountId},
+                #{githubCommitSha},
+                #{committedAt},
+                #{message},
+                #{htmlUrl},
+                #{additions},
+                #{deletions},
+                #{totalChanges},
+                #{filesChanged},
+                NOW(),
+                NOW())
     </insert>
 
+    <select id="findByRepoId"
+            parameterType="long"
+            resultMap="CommitLogResultMap">
+        SELECT id,
+               github_repo_id,
+               user_account_id,
+               github_commit_sha,
+               committed_at,
+               message,
+               additions,
+               deletions,
+               total_changes,
+               files_changed
+        FROM commit_log
+        WHERE github_repo_id = #{repoId}
+        ORDER BY committed_at DESC
+    </select>
 </mapper>
