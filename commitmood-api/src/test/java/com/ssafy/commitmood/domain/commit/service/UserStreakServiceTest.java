@@ -1,9 +1,19 @@
 package com.ssafy.commitmood.domain.commit.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+
 import com.ssafy.commitmood.domain.commit.common.DateOptionsEnum;
 import com.ssafy.commitmood.domain.commit.dto.DailyCommitCountDto;
 import com.ssafy.commitmood.domain.commit.dto.response.UserStreakResponse;
-import com.ssafy.commitmood.domain.commit.mapper.UserStreakMapper;
+import com.ssafy.commitmood.domain.commit.repository.UserStreakRepository;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,23 +21,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UserStreakService 테스트")
 public class UserStreakServiceTest {
 
     @Mock
-    private UserStreakMapper userStreakMapper;
+    private UserStreakRepository userStreakRepository;
 
     @InjectMocks
     private UserStreakService userStreakService;
@@ -44,11 +43,11 @@ public class UserStreakServiceTest {
                 new DailyCommitCountDto(today.minusDays(2), 0L)
         );
 
-        given(userStreakMapper.findDailyCommitCounts(
+        given(userStreakRepository.findDailyCommitCounts(
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)
         )).willReturn(dailyCommitCountDtoList);
 
-        given(userStreakMapper.countTotalCommitDays(
+        given(userStreakRepository.countTotalCommitDays(
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)
         )).willReturn(3);
 
@@ -61,9 +60,9 @@ public class UserStreakServiceTest {
         assertThat(response.dailyCommits()).hasSize(3);
         assertThat(response.dailyCommits().get(today)).isEqualTo(3L);
 
-        verify(userStreakMapper).findDailyCommitCounts(
+        verify(userStreakRepository).findDailyCommitCounts(
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class));
-        verify(userStreakMapper).countTotalCommitDays(
+        verify(userStreakRepository).countTotalCommitDays(
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class));
     }
 
@@ -72,10 +71,10 @@ public class UserStreakServiceTest {
     void getUserStreak_Month() {
         Long userAccountId = 1L;
 
-        given(userStreakMapper.findDailyCommitCounts(
+        given(userStreakRepository.findDailyCommitCounts(
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)
         )).willReturn(Collections.emptyList());
-        given(userStreakMapper.countTotalCommitDays(
+        given(userStreakRepository.countTotalCommitDays(
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)
         )).willReturn(0);
 
@@ -86,7 +85,7 @@ public class UserStreakServiceTest {
         assertThat(response.longestStreak()).isEqualTo(0);
         assertThat(response.totalCommitDays()).isEqualTo(0);
 
-        verify(userStreakMapper).findDailyCommitCounts(
+        verify(userStreakRepository).findDailyCommitCounts(
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class));
     }
 
@@ -103,10 +102,10 @@ public class UserStreakServiceTest {
                 new DailyCommitCountDto(today.minusDays(12), 1L)
         );
 
-        given(userStreakMapper.findDailyCommitCounts(
+        given(userStreakRepository.findDailyCommitCounts(
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(dailyCommits);
-        given(userStreakMapper.countTotalCommitDays(
+        given(userStreakRepository.countTotalCommitDays(
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(5);
 
@@ -116,7 +115,7 @@ public class UserStreakServiceTest {
         assertThat(response.longestStreak()).isEqualTo(3);
         assertThat(response.totalCommitDays()).isEqualTo(5);
 
-        verify(userStreakMapper).findDailyCommitCounts(
+        verify(userStreakRepository).findDailyCommitCounts(
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class));
     }
 
@@ -132,10 +131,10 @@ public class UserStreakServiceTest {
                 new DailyCommitCountDto(today.minusDays(3), 3L)
         );
 
-        given(userStreakMapper.findDailyCommitCounts(
+        given(userStreakRepository.findDailyCommitCounts(
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(dailyCommits);
-        given(userStreakMapper.countTotalCommitDays(
+        given(userStreakRepository.countTotalCommitDays(
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(3);
 
@@ -166,10 +165,10 @@ public class UserStreakServiceTest {
                 new DailyCommitCountDto(today.minusDays(14), 1L)
         );
 
-        given(userStreakMapper.findDailyCommitCounts(
+        given(userStreakRepository.findDailyCommitCounts(
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(dailyCommits);
-        given(userStreakMapper.countTotalCommitDays(
+        given(userStreakRepository.countTotalCommitDays(
                 eq(userAccountId), any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(10);
 
