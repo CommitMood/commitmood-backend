@@ -1,4 +1,4 @@
-package com.ssafy.commitmood.domain.commit.repository;
+package com.ssafy.commitmood.domain.commit.mapper;
 
 import com.ssafy.commitmood.domain.commit.entity.CommitLog;
 import java.util.List;

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.ssafy.commitmood.domain.commit.repository.FlaggedTokenMapper">
+<mapper namespace="com.ssafy.commitmood.domain.commit.mapper.FlaggedTokenMapper">
 
     <!-- 플래그 토큰 저장 -->
     <insert id="insert" parameterType="com.ssafy.commitmood.domain.commit.entity.FlaggedToken"

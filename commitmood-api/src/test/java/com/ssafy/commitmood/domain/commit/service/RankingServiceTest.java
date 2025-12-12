@@ -8,7 +8,7 @@ import com.ssafy.commitmood.domain.commit.dto.UserRepoStatsDto;
 import com.ssafy.commitmood.domain.commit.dto.UserSentimentStatsDto;
 import com.ssafy.commitmood.domain.commit.dto.response.RankingListResponse;
 import com.ssafy.commitmood.domain.commit.dto.response.UserRankingDetailResponse;
-import com.ssafy.commitmood.domain.commit.repository.RankingMapper;
+import com.ssafy.commitmood.domain.commit.mapper.RankingMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

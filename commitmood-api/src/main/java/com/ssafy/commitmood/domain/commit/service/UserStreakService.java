@@ -3,7 +3,7 @@ package com.ssafy.commitmood.domain.commit.service;
 import com.ssafy.commitmood.domain.commit.common.DateOptionsEnum;
 import com.ssafy.commitmood.domain.commit.dto.DailyCommitCountDto;
 import com.ssafy.commitmood.domain.commit.dto.response.UserStreakResponse;
-import com.ssafy.commitmood.domain.commit.repository.UserStreakMapper;
+import com.ssafy.commitmood.domain.commit.mapper.UserStreakMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

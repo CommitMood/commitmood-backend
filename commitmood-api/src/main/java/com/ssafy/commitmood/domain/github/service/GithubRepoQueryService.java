@@ -2,7 +2,7 @@ package com.ssafy.commitmood.domain.github.service;
 
 import com.ssafy.commitmood.common.dto.response.PageResponse;
 import com.ssafy.commitmood.domain.commit.entity.CommitLog;
-import com.ssafy.commitmood.domain.commit.repository.CommitLogMapper;
+import com.ssafy.commitmood.domain.commit.mapper.CommitLogMapper;
 import com.ssafy.commitmood.domain.github.dto.response.GithubCommitResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoListResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoResponse;

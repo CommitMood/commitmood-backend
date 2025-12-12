@@ -5,7 +5,7 @@ import com.ssafy.commitmood.domain.commit.common.UserRankingDetailOptions;
 import com.ssafy.commitmood.domain.commit.dto.UserRankingDto;
 import com.ssafy.commitmood.domain.commit.dto.response.RankingListResponse;
 import com.ssafy.commitmood.domain.commit.dto.response.UserRankingDetailResponse;
-import com.ssafy.commitmood.domain.commit.repository.RankingMapper;
+import com.ssafy.commitmood.domain.commit.mapper.RankingMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

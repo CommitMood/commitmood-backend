@@ -1,4 +1,4 @@
-package com.ssafy.commitmood.domain.commit.repository;
+package com.ssafy.commitmood.domain.commit.mapper;
 
 import com.ssafy.commitmood.domain.commit.dto.DailyCommitCountDto;
 import org.apache.ibatis.annotations.Mapper;

@@ -3,7 +3,7 @@ package com.ssafy.commitmood.domain.commit.service;
 import com.ssafy.commitmood.domain.commit.dto.response.CommitAnalysisResponse;
 import com.ssafy.commitmood.domain.commit.dto.response.FlaggedTokenResponse;
 import com.ssafy.commitmood.domain.commit.entity.CommitAnalysis;
-import com.ssafy.commitmood.domain.commit.repository.CommitAnalysisMapper;
+import com.ssafy.commitmood.domain.commit.mapper.CommitAnalysisMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

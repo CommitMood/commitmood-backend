@@ -1,4 +1,4 @@
-package com.ssafy.commitmood.domain.commit.repository;
+package com.ssafy.commitmood.domain.commit.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @MapperScan(basePackages = {
-        "com.ssafy.commitmood.domain.commit.repository",
+        "com.ssafy.commitmood.domain.commit.mapper",
 })
 @ActiveProfiles("test")
 @Transactional

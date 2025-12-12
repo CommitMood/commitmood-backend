@@ -1,4 +1,4 @@
-package com.ssafy.commitmood.domain.commit.repository;
+package com.ssafy.commitmood.domain.commit.mapper;
 
 import com.ssafy.commitmood.domain.commit.entity.CommitAnalysis;
 import com.ssafy.commitmood.domain.commit.entity.CommitLog;
@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayName("CommitAnalysisMapper 테스트")
 @MapperScan(basePackages = {
-        "com.ssafy.commitmood.domain.commit.repository",
+        "com.ssafy.commitmood.domain.commit.mapper",
         "com.ssafy.commitmood.domain.user.mapper",
 })
 @ActiveProfiles("test")

@@ -4,7 +4,7 @@ import com.ssafy.commitmood.domain.commit.dto.response.CommitAnalysisResponse;
 import com.ssafy.commitmood.domain.commit.dto.response.FlaggedTokenResponse;
 import com.ssafy.commitmood.domain.commit.entity.CommitAnalysis;
 import com.ssafy.commitmood.domain.commit.entity.FlaggedToken;
-import com.ssafy.commitmood.domain.commit.repository.CommitAnalysisMapper;
+import com.ssafy.commitmood.domain.commit.mapper.CommitAnalysisMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
