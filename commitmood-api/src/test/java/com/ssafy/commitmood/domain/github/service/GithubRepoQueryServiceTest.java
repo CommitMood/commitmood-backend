@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ssafy.commitmood.common.dto.response.PageResponse;
 import com.ssafy.commitmood.domain.commit.entity.CommitLog;
-import com.ssafy.commitmood.domain.commit.mapper.CommitLogMapper;
+import com.ssafy.commitmood.domain.commit.repository.CommitLogRepository;
 import com.ssafy.commitmood.domain.github.dto.response.GithubCommitResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoListResponse;
 import com.ssafy.commitmood.domain.github.dto.response.GithubRepoResponse;
@@ -37,7 +37,7 @@ class GithubRepoQueryServiceTest {
     UserAccountRepository userRepository;
 
     @Autowired
-    CommitLogMapper commitLogMapper;
+    CommitLogRepository commitLogRepository;
 
     private Long createUser(String login) {
         UserAccount user = UserAccount.create(
@@ -175,7 +175,7 @@ class GithubRepoQueryServiceTest {
                 3L
         );
 
-        commitLogMapper.insert(commit);
+        commitLogRepository.save(commit);
 
         // ---------------------------------------------
         // WHEN: 서비스에서 getCommitsByRepo 호출
@@ -187,7 +187,7 @@ class GithubRepoQueryServiceTest {
         // ---------------------------------------------
         assertThat(result).hasSize(1);
 
-        GithubCommitResponse first = result.get(0);
+        GithubCommitResponse first = result.getFirst();
 
         assertThat(first.id()).isNotNull();
         assertThat(first.repoId()).isEqualTo(repo.getId());
