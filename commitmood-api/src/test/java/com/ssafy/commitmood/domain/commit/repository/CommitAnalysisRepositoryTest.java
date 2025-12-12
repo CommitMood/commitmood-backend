@@ -3,10 +3,14 @@ package com.ssafy.commitmood.domain.commit.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ssafy.commitmood.domain.commit.entity.CommitAnalysis;
+import com.ssafy.commitmood.domain.commit.entity.CommitLog;
+import com.ssafy.commitmood.domain.github.entity.GithubRepo;
+import com.ssafy.commitmood.domain.github.repository.GithubRepoRepository;
+import com.ssafy.commitmood.domain.github.repository.GithubRepoRepositoryImpl;
+import com.ssafy.commitmood.domain.user.entity.UserAccount;
+import com.ssafy.commitmood.domain.user.mapper.UserAccountMapper;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import javax.sql.DataSource;
-import org.junit.jupiter.api.BeforeEach;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,63 +19,79 @@ import org.springframework.test.context.ActiveProfiles;
 
 @MybatisTest
 @ActiveProfiles("test")
-@Import(CommitAnalysisRepositoryImpl.class)
+@Import({CommitAnalysisRepositoryImpl.class,
+        CommitLogRepositoryImpl.class,
+        GithubRepoRepositoryImpl.class})
 class CommitAnalysisRepositoryTest {
 
     @Autowired
-    private CommitAnalysisRepository commitAnalysisRepository;
+    CommitAnalysisRepository analysisRepo;
 
     @Autowired
-    private DataSource dataSource;
+    CommitLogRepository logRepo;
 
-    @BeforeEach
-    void setup() throws Exception {
-        try (Connection conn = dataSource.getConnection()) {
+    @Autowired
+    GithubRepoRepository repoRepo;
 
-            // USER_ACCOUNT
-            conn.prepareStatement("""
-                        INSERT INTO USER_ACCOUNT
-                        (ID, GITHUB_USER_ID, GITHUB_LOGIN, CREATED_AT, UPDATED_AT)
-                        VALUES (1, 100, 'tester', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                    """).executeUpdate();
+    @Autowired
+    UserAccountMapper userMapper;
 
-            // GITHUB_REPO
-            conn.prepareStatement("""
-                        INSERT INTO GITHUB_REPO
-                        (ID, USER_ACCOUNT_ID, GITHUB_REPO_ID, GITHUB_REPO_NAME, GITHUB_REPO_FULL_NAME,
-                         DEFAULT_BRANCH, DESCRIPTION, GITHUB_REPO_URL, IS_PRIVATE, LAST_SYNCED_AT,
-                         CREATED_AT, UPDATED_AT)
-                        VALUES
-                        (1, 1, 500, 'repo', 'tester/repo', 'main',
-                         NULL, NULL, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                    """).executeUpdate();
+    private Long insertUser(String login) {
+        UserAccount user = UserAccount.create(
+                System.nanoTime(),
+                login,
+                login + "@mail.com",
+                "avatar",
+                login + "Name"
+        );
+        userMapper.insert(user);
+        return user.getId();
+    }
 
-            // COMMIT_LOG
-            conn.prepareStatement("""
-                        INSERT INTO COMMIT_LOG
-                        (ID, GITHUB_REPO_ID, USER_ACCOUNT_ID,
-                         GITHUB_COMMIT_SHA, COMMITTED_AT, MESSAGE,
-                         CREATED_AT, UPDATED_AT)
-                        VALUES
-                        (1, 1, 1,
-                         'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-                         CURRENT_TIMESTAMP, 'test commit',
-                         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                    """).executeUpdate();
-        }
+    private Long insertRepo(Long userId) {
+        GithubRepo repo = GithubRepo.create(
+                userId,
+                System.nanoTime(),
+                "repo",
+                "devys/repo",
+                "main",
+                "desc",
+                "url",
+                false
+        );
+        return repoRepo.save(repo).getId();
+    }
+
+    private Long insertCommitLog(Long repoId, Long userId) {
+        CommitLog log = CommitLog.create(
+                repoId,
+                userId,
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                LocalDateTime.now(),
+                "message",
+                null,
+                0L, 0L, 0L, null
+        );
+        logRepo.save(log);
+        return log.getId();
     }
 
     @Test
     void saveAndFind() {
+        Long uid = insertUser("a");
+        Long rid = insertRepo(uid);
+        Long lid = insertCommitLog(rid, uid);
+
         CommitAnalysis analysis = CommitAnalysis.create(
-                1L, 5L, 2L, 3L, 1L,
+                lid,
+                1L, 1L, 1L, 1L,
                 CommitAnalysis.Sentiment.NEGATIVE,
-                BigDecimal.valueOf(-0.4)
+                BigDecimal.valueOf(-0.5)
         );
 
-        commitAnalysisRepository.save(analysis);
+        analysisRepo.save(analysis);
 
-        var found = commitAnalysisRepository.findByCommitLogId(1L);
+        var found = analysisRepo.findByCommitLogId(lid);
         assertThat(found).isPresent();
     }
 }
