@@ -170,7 +170,7 @@ for i in range(COMMIT_COUNT):
     f_commit.write(
         f"INSERT INTO COMMIT_LOG (ID,GITHUB_REPO_ID,USER_ACCOUNT_ID,GITHUB_COMMIT_SHA,COMMITTED_AT,MESSAGE,ADDITIONS,DELETIONS,TOTAL_CHANGES)"
         f" VALUES({cid},{random.choice(repo_ids)},{random.choice(user_ids)},'{sha()}',"
-        f"DATEADD('DAY', -{random.randint(0,365)}, CURRENT_TIMESTAMP()),"
+        f"DATE_SUB(NOW(), INTERVAL {random.randint(0,365)} DAY),"
         f"'{msg}',{random.randint(0,300)},{random.randint(0,100)},{random.randint(0,400)});\n"
     )
 
