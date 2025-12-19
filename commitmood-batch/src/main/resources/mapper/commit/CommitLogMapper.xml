@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.commitmood.domain.commit.mapper.CommitLogMapper">
+
+    <resultMap id="commitLogResultMap" type="com.ssafy.commitmood.domain.commit.entity.CommitLog">
+        <id property="id" column="ID"/>
+        <result property="githubRepoId" column="GITHUB_REPO_ID"/>
+        <result property="userAccountId" column="USER_ACCOUNT_ID"/>
+        <result property="githubCommitSha" column="GITHUB_COMMIT_SHA"/>
+        <result property="committedAt" column="COMMITTED_AT"/>
+        <result property="message" column="MESSAGE"/>
+        <result property="htmlUrl" column="HTML_URL"/>
+        <result property="additions" column="ADDITIONS"/>
+        <result property="deletions" column="DELETIONS"/>
+        <result property="totalChanges" column="TOTAL_CHANGES"/>
+        <result property="filesChanged" column="FILES_CHANGED"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
+    </resultMap>
+
+    <!-- INSERT -->
+    <insert id="insert" parameterType="com.ssafy.commitmood.domain.commit.entity.CommitLog"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+        INSERT INTO COMMIT_LOG (
+            GITHUB_REPO_ID,
+            USER_ACCOUNT_ID,
+            GITHUB_COMMIT_SHA,
+            COMMITTED_AT,
+            MESSAGE,
+            HTML_URL,
+            ADDITIONS,
+            DELETIONS,
+            TOTAL_CHANGES,
+            FILES_CHANGED,
+            CREATED_AT,
+            UPDATED_AT
+        ) VALUES (
+                     #{githubRepoId},
+                     #{userAccountId},
+                     #{githubCommitSha},
+                     #{committedAt},
+                     #{message},
+                     #{htmlUrl},
+                     #{additions},
+                     #{deletions},
+                     #{totalChanges},
+                     #{filesChanged},
+                     CURRENT_TIMESTAMP,
+                     CURRENT_TIMESTAMP
+                 )
+    </insert>
+
+    <!-- UPDATE -->
+    <update id="update" parameterType="com.ssafy.commitmood.domain.commit.entity.CommitLog">
+        UPDATE COMMIT_LOG
+        SET MESSAGE = #{message},
+            ADDITIONS = #{additions},
+            DELETIONS = #{deletions},
+            TOTAL_CHANGES = #{totalChanges},
+            FILES_CHANGED = #{filesChanged},
+            UPDATED_AT = CURRENT_TIMESTAMP
+        WHERE ID = #{id}
+    </update>
+
+    <!-- SELECT BY ID -->
+    <select id="findById" resultMap="commitLogResultMap">
+        SELECT *
+        FROM COMMIT_LOG
+        WHERE ID = #{id}
+    </select>
+
+    <!-- SELECT BY REPO_ID AND SHA -->
+    <select id="findByRepoIdAndSha" resultMap="commitLogResultMap">
+        SELECT *
+        FROM COMMIT_LOG
+        WHERE GITHUB_REPO_ID = #{githubRepoId}
+          AND GITHUB_COMMIT_SHA = #{githubCommitSha}
+    </select>
+
+    <!-- SELECT ALL BY GITHUB_REPO_ID -->
+    <select id="findAllByGithubRepoId" resultMap="commitLogResultMap">
+        SELECT *
+        FROM COMMIT_LOG
+        WHERE GITHUB_REPO_ID = #{githubRepoId}
+        ORDER BY COMMITTED_AT DESC
+    </select>
+
+    <!-- SELECT ALL BY USER_ACCOUNT_ID -->
+    <select id="findAllByUserAccountId" resultMap="commitLogResultMap">
+        SELECT *
+        FROM COMMIT_LOG
+        WHERE USER_ACCOUNT_ID = #{userAccountId}
+        ORDER BY COMMITTED_AT DESC
+    </select>
+
+    <!-- SELECT ALL BY USER_ACCOUNT_ID AND DATE RANGE -->
+    <select id="findAllByUserAccountIdAndDateRange" resultMap="commitLogResultMap">
+        SELECT *
+        FROM COMMIT_LOG
+        WHERE USER_ACCOUNT_ID = #{userAccountId}
+        <if test="startDate != null">
+            AND COMMITTED_AT &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND COMMITTED_AT &lt;= #{endDate}
+        </if>
+        ORDER BY COMMITTED_AT DESC
+    </select>
+
+    <!-- SELECT ALL BY GITHUB_REPO_ID AND DATE RANGE -->
+    <select id="findAllByGithubRepoIdAndDateRange" resultMap="commitLogResultMap">
+        SELECT *
+        FROM COMMIT_LOG
+        WHERE GITHUB_REPO_ID = #{githubRepoId}
+        <if test="startDate != null">
+            AND COMMITTED_AT &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND COMMITTED_AT &lt;= #{endDate}
+        </if>
+        ORDER BY COMMITTED_AT DESC
+    </select>
+
+    <!-- DELETE BY ID -->
+    <delete id="deleteById">
+        DELETE FROM COMMIT_LOG
+        WHERE ID = #{id}
+    </delete>
+
+    <!-- EXISTS BY REPO_ID AND SHA -->
+    <select id="existsByRepoIdAndSha" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM COMMIT_LOG
+        WHERE GITHUB_REPO_ID = #{githubRepoId}
+          AND GITHUB_COMMIT_SHA = #{githubCommitSha}
+    </select>
+
+    <!-- COUNT BY USER_ACCOUNT_ID -->
+    <select id="countByUserAccountId" resultType="int">
+        SELECT COUNT(*)
+        FROM COMMIT_LOG
+        WHERE USER_ACCOUNT_ID = #{userAccountId}
+    </select>
+
+    <!-- COUNT BY GITHUB_REPO_ID -->
+    <select id="countByGithubRepoId" resultType="int">
+        SELECT COUNT(*)
+        FROM COMMIT_LOG
+        WHERE GITHUB_REPO_ID = #{githubRepoId}
+    </select>
+
+</mapper>

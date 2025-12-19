@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.commitmood.domain.commit.mapper.UserRankingMapper">
+
+    <resultMap id="userRankingDetailResultMap"
+               type="com.ssafy.commitmood.domain.commit.mapper.UserRankingMapper$UserRankingDetail">
+        <result property="commitLogId" column="COMMIT_LOG_ID"/>
+        <result property="repoFullName" column="REPO_FULL_NAME"/>
+        <result property="message" column="MESSAGE"/>
+        <result property="committedAt" column="COMMITTED_AT"/>
+        <result property="flaggedCount" column="FLAGGED_COUNT"/>
+        <result property="swearCount" column="SWEAR_COUNT"/>
+        <result property="sentiment" column="SENTIMENT"/>
+        <result property="sentimentScore" column="SENTIMENT_SCORE"/>
+        <result property="githubUrl" column="GITHUB_URL"/>
+    </resultMap>
+
+    <!-- 사용자의 저장소별 커밋 통계 -->
+    <select id="findUserRankingByRepo" resultMap="userRankingDetailResultMap">
+        SELECT
+            cl.COMMIT_LOG_ID,
+            gr.REPOSITORY_FULL_NAME AS REPO_FULL_NAME,
+            cl.MESSAGE,
+            cl.COMMITTED_AT,
+            COALESCE(ca.FLAGGED_COUNT, 0) AS FLAGGED_COUNT,
+            COALESCE(ca.SWEAR_COUNT, 0) AS SWEAR_COUNT,
+            ca.SENTIMENT,
+            ca.SENTIMENT_SCORE,
+            cl.HTML_URL AS GITHUB_URL
+        FROM COMMIT_LOG cl
+                 INNER JOIN GITHUB_REPOSITORY gr ON cl.GITHUB_REPOSITORY_ID = gr.GITHUB_REPOSITORY_ID
+                 LEFT JOIN COMMIT_ANALYSIS ca ON cl.COMMIT_LOG_ID = ca.COMMIT_LOG_ID
+        WHERE cl.AUTHOR_USER_ACCOUNT_ID = #{userAccountId}
+        ORDER BY gr.REPOSITORY_FULL_NAME, cl.COMMITTED_AT DESC
+            LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 사용자의 플래그 토큰별 통계 -->
+    <select id="findUserRankingByFlagged" resultMap="userRankingDetailResultMap">
+        SELECT
+            cl.COMMIT_LOG_ID,
+            gr.REPOSITORY_FULL_NAME AS REPO_FULL_NAME,
+            cl.MESSAGE,
+            cl.COMMITTED_AT,
+            COALESCE(ca.FLAGGED_COUNT, 0) AS FLAGGED_COUNT,
+            COALESCE(ca.SWEAR_COUNT, 0) AS SWEAR_COUNT,
+            ca.SENTIMENT,
+            ca.SENTIMENT_SCORE,
+            cl.HTML_URL AS GITHUB_URL
+        FROM COMMIT_LOG cl
+                 INNER JOIN GITHUB_REPOSITORY gr ON cl.GITHUB_REPOSITORY_ID = gr.GITHUB_REPOSITORY_ID
+                 LEFT JOIN COMMIT_ANALYSIS ca ON cl.COMMIT_LOG_ID = ca.COMMIT_LOG_ID
+        WHERE cl.AUTHOR_USER_ACCOUNT_ID = #{userAccountId}
+          AND ca.FLAGGED_COUNT > 0
+        ORDER BY ca.FLAGGED_COUNT DESC, cl.COMMITTED_AT DESC
+            LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 사용자의 감정별 커밋 통계 -->
+    <select id="findUserRankingBySentiment" resultMap="userRankingDetailResultMap">
+        SELECT
+            cl.COMMIT_LOG_ID,
+            gr.REPOSITORY_FULL_NAME AS REPO_FULL_NAME,
+            cl.MESSAGE,
+            cl.COMMITTED_AT,
+            COALESCE(ca.FLAGGED_COUNT, 0) AS FLAGGED_COUNT,
+            COALESCE(ca.SWEAR_COUNT, 0) AS SWEAR_COUNT,
+            ca.SENTIMENT,
+            ca.SENTIMENT_SCORE,
+            cl.HTML_URL AS GITHUB_URL
+        FROM COMMIT_LOG cl
+                 INNER JOIN GITHUB_REPOSITORY gr ON cl.GITHUB_REPOSITORY_ID = gr.GITHUB_REPOSITORY_ID
+                 LEFT JOIN COMMIT_ANALYSIS ca ON cl.COMMIT_LOG_ID = ca.COMMIT_LOG_ID
+        WHERE cl.AUTHOR_USER_ACCOUNT_ID = #{userAccountId}
+          AND ca.SENTIMENT IS NOT NULL
+        ORDER BY ca.SENTIMENT, ca.SENTIMENT_SCORE DESC, cl.COMMITTED_AT DESC
+            LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 저장소별 카운트 -->
+    <select id="countUserRankingByRepo" resultType="int">
+        SELECT COUNT(*)
+        FROM COMMIT_LOG cl
+        WHERE cl.AUTHOR_USER_ACCOUNT_ID = #{userAccountId}
+    </select>
+
+    <!-- 플래그별 카운트 -->
+    <select id="countUserRankingByFlagged" resultType="int">
+        SELECT COUNT(*)
+        FROM COMMIT_LOG cl
+                 INNER JOIN COMMIT_ANALYSIS ca ON cl.COMMIT_LOG_ID = ca.COMMIT_LOG_ID
+        WHERE cl.AUTHOR_USER_ACCOUNT_ID = #{userAccountId}
+          AND ca.FLAGGED_COUNT > 0
+    </select>
+
+    <!-- 감정별 카운트 -->
+    <select id="countUserRankingBySentiment" resultType="int">
+        SELECT COUNT(*)
+        FROM COMMIT_LOG cl
+                 INNER JOIN COMMIT_ANALYSIS ca ON cl.COMMIT_LOG_ID = ca.COMMIT_LOG_ID
+        WHERE cl.AUTHOR_USER_ACCOUNT_ID = #{userAccountId}
+          AND ca.SENTIMENT IS NOT NULL
+    </select>
+
+</mapper>

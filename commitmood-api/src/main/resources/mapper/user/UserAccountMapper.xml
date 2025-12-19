@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.commitmood.domain.user.mapper.UserAccountMapper">
+
+    <!-- Result Mapping -->
+    <resultMap id="UserAccountResultMap"
+               type="com.ssafy.commitmood.domain.user.entity.UserAccount">
+        <id property="id" column="id"/>
+        <result property="githubUserId" column="github_user_id"/>
+        <result property="githubLogin" column="github_login"/>
+        <result property="githubEmail" column="github_email"/>
+        <result property="githubAvatarUrl" column="github_avatar_url"/>
+        <result property="githubName" column="github_name"/>
+        <result property="lastSyncedAt" column="last_synced_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- Insert -->
+    <insert id="insert"
+            parameterType="com.ssafy.commitmood.domain.user.entity.UserAccount"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_account (github_user_id,
+                                  github_login,
+                                  github_email,
+                                  github_avatar_url,
+                                  github_name)
+        VALUES (#{githubUserId},
+                #{githubLogin},
+                #{githubEmail},
+                #{githubAvatarUrl},
+                #{githubName})
+    </insert>
+
+    <!-- Find by ID -->
+    <select id="findById" resultMap="UserAccountResultMap">
+        SELECT *
+        FROM user_account
+        WHERE id = #{id}
+    </select>
+
+    <!-- ================================
+     🔹 단건 조회 (기존 findByPrefix)
+     prefix 기준 첫 번째 결과만 반환
+    ================================ -->
+    <select id="findByPrefixOne" resultMap="UserAccountResultMap">
+        SELECT *
+        FROM user_account
+        <where>
+            <if test="condition.email != null and condition.email != ''">
+                github_email LIKE CONCAT(#{condition.email}, '%')
+            </if>
+            <if test="condition.githubLogin != null and condition.githubLogin != ''">
+                github_login LIKE CONCAT(#{condition.githubLogin}, '%')
+            </if>
+            <if test="condition.name != null and condition.name != ''">
+                github_name LIKE CONCAT(#{condition.name}, '%')
+            </if>
+            <!-- default → name prefix 검색 / name 없으면 전체 -->
+            <if test="condition.email == null
+               and condition.githubLogin == null
+               and condition.name == null">
+                github_name LIKE '%'
+            </if>
+        </where>
+        LIMIT 1
+    </select>
+
+
+    <!-- ================================
+         🔹 prefix 기반 전체 목록 조회
+         확장 시 사용 (검색 API로 연결)
+    ================================ -->
+    <select id="findAllByPrefix" resultMap="UserAccountResultMap">
+        SELECT *
+        FROM user_account
+        <where>
+            <if test="condition.email != null and condition.email != ''">
+                github_email LIKE CONCAT(#{condition.email}, '%')
+            </if>
+            <if test="condition.githubLogin != null and condition.githubLogin != ''">
+                github_login LIKE CONCAT(#{condition.githubLogin}, '%')
+            </if>
+            <if test="condition.name != null and condition.name != ''">
+                github_name LIKE CONCAT(#{condition.name}, '%')
+            </if>
+        </where>
+        ORDER BY github_login ASC
+    </select>
+
+    <!-- Search by Login (LIKE 검색) -->
+    <select id="searchByLoginLike" resultMap="UserAccountResultMap">
+        SELECT *
+        FROM user_account
+        <where>
+            <if test="query != null and query != ''">
+                (github_login LIKE CONCAT('%', #{query}, '%')
+                OR github_email LIKE CONCAT('%', #{query}, '%')
+                OR github_name LIKE CONCAT('%', #{query}, '%'))
+            </if>
+        </where>
+        ORDER BY github_login ASC
+    </select>
+
+    <select id="searchByLoginPaged" resultMap="UserAccountResultMap">
+        SELECT *
+        FROM user_account
+        <where>
+            <if test="query != null and query != ''">
+                (github_login LIKE CONCAT('%', #{query}, '%')
+                OR github_email LIKE CONCAT('%', #{query}, '%')
+                OR github_name LIKE CONCAT('%', #{query}, '%'))
+            </if>
+        </where>
+        ORDER BY github_login ASC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- Update all fields (profile change) -->
+    <update id="update" parameterType="com.ssafy.commitmood.domain.user.entity.UserAccount">
+        UPDATE user_account
+        SET github_email      = #{githubEmail},
+            github_avatar_url = #{githubAvatarUrl},
+            github_name       = #{githubName}
+        WHERE id = #{id}
+    </update>
+
+    <!-- Update lastSyncedAt -->
+    <update id="updateLastSyncedAt">
+        UPDATE user_account
+        SET last_synced_at = #{lastSyncedAt}
+        WHERE id = #{id}
+    </update>
+
+    <!-- Delete -->
+    <delete id="deleteById">
+        DELETE
+        FROM user_account
+        WHERE id = #{id}
+    </delete>
+
+    <!-- Paging -->
+    <select id="countByLogin" resultType="long">
+        SELECT COUNT(*)
+        FROM user_account
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (github_login LIKE CONCAT('%', #{keyword}, '%')
+                OR github_email LIKE CONCAT('%', #{keyword}, '%')
+                OR github_name LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+</mapper>

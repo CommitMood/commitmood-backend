@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.commitmood.domain.commit.mapper.FlaggedTokenMapper">
+
+    <resultMap id="flaggedTokenResultMap" type="com.ssafy.commitmood.domain.commit.entity.FlaggedToken">
+        <id property="id" column="ID"/>
+        <result property="commitLogId" column="COMMIT_LOG_ID"/>
+        <result property="token" column="TOKEN"/>
+        <result property="tokenType" column="TOKEN_TYPE" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="weight" column="WEIGHT"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
+    </resultMap>
+
+    <!-- INSERT -->
+    <insert id="insert" parameterType="com.ssafy.commitmood.domain.commit.entity.FlaggedToken"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+        INSERT INTO FLAGGED_TOKEN (
+            COMMIT_LOG_ID,
+            TOKEN,
+            TOKEN_TYPE,
+            WEIGHT,
+            CREATED_AT,
+            UPDATED_AT
+        ) VALUES (
+                     #{commitLogId},
+                     #{token},
+                     #{tokenType},
+                     #{weight},
+                     CURRENT_TIMESTAMP,
+                     CURRENT_TIMESTAMP
+                 )
+    </insert>
+
+    <!-- INSERT BATCH -->
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO FLAGGED_TOKEN (
+        COMMIT_LOG_ID,
+        TOKEN,
+        TOKEN_TYPE,
+        WEIGHT,
+        CREATED_AT,
+        UPDATED_AT
+        ) VALUES
+        <foreach collection="flaggedTokens" item="item" separator=",">
+            (
+            #{item.commitLogId},
+            #{item.token},
+            #{item.tokenType},
+            #{item.weight},
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP
+            )
+        </foreach>
+    </insert>
+
+    <!-- UPDATE -->
+    <update id="update" parameterType="com.ssafy.commitmood.domain.commit.entity.FlaggedToken">
+        UPDATE FLAGGED_TOKEN
+        SET TOKEN_TYPE = #{tokenType},
+            WEIGHT = #{weight},
+            UPDATED_AT = CURRENT_TIMESTAMP
+        WHERE ID = #{id}
+    </update>
+
+    <!-- SELECT BY ID -->
+    <select id="findById" resultMap="flaggedTokenResultMap">
+        SELECT *
+        FROM FLAGGED_TOKEN
+        WHERE ID = #{id}
+    </select>
+
+    <!-- SELECT ALL BY COMMIT_LOG_ID -->
+    <select id="findAllByCommitLogId" resultMap="flaggedTokenResultMap">
+        SELECT *
+        FROM FLAGGED_TOKEN
+        WHERE COMMIT_LOG_ID = #{commitLogId}
+        ORDER BY WEIGHT DESC, TOKEN
+    </select>
+
+    <!-- SELECT ALL BY COMMIT_LOG_ID AND TOKEN_TYPE -->
+    <select id="findAllByCommitLogIdAndTokenType" resultMap="flaggedTokenResultMap">
+        SELECT *
+        FROM FLAGGED_TOKEN
+        WHERE COMMIT_LOG_ID = #{commitLogId}
+          AND TOKEN_TYPE = #{tokenType}
+        ORDER BY WEIGHT DESC, TOKEN
+    </select>
+
+    <!-- SELECT BY COMMIT_LOG_ID AND TOKEN AND TOKEN_TYPE -->
+    <select id="findByCommitLogIdAndTokenAndType" resultMap="flaggedTokenResultMap">
+        SELECT *
+        FROM FLAGGED_TOKEN
+        WHERE COMMIT_LOG_ID = #{commitLogId}
+          AND TOKEN = #{token}
+          AND TOKEN_TYPE = #{tokenType}
+    </select>
+
+    <!-- DELETE BY ID -->
+    <delete id="deleteById">
+        DELETE FROM FLAGGED_TOKEN
+        WHERE ID = #{id}
+    </delete>
+
+    <!-- DELETE ALL BY COMMIT_LOG_ID -->
+    <delete id="deleteAllByCommitLogId">
+        DELETE FROM FLAGGED_TOKEN
+        WHERE COMMIT_LOG_ID = #{commitLogId}
+    </delete>
+
+    <!-- COUNT BY COMMIT_LOG_ID -->
+    <select id="countByCommitLogId" resultType="int">
+        SELECT COUNT(*)
+        FROM FLAGGED_TOKEN
+        WHERE COMMIT_LOG_ID = #{commitLogId}
+    </select>
+
+</mapper>
