@@ -3,7 +3,7 @@ package com.ssafy.commitmood.reader;
 import com.ssafy.commitmood.config.GithubRestClientConfig;
 import com.ssafy.commitmood.dto.GithubCommitDto;
 import com.ssafy.commitmood.dto.GithubCommitStatsDto;
-import com.ssafy.commitmood.dto.GithubRepositoryDto;
+import com.ssafy.commitmood.dto.GithubRepoDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -17,11 +17,11 @@ import java.util.List;
 public class GithubReader {
     private final GithubRestClientConfig config;
 
-    public List<GithubRepositoryDto> callGithubUserToRepo(String username, int page) {
+    public List<GithubRepoDto> callGithubUserToRepo(String username, int page) {
         return callGithubUserToRepo(username, page, 100);
     }
 
-    public List<GithubRepositoryDto> callGithubUserToRepo(String username, int page, int perPage) {
+    public List<GithubRepoDto> callGithubUserToRepo(String username, int page, int perPage) {
         return config.restClient().get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/users/{username}/repos")

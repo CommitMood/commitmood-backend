@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.commitmood.domain.commit.mapper.FlaggedTokenMapper">
+
+    <!-- 플래그 토큰 저장 -->
+    <insert id="insert" parameterType="com.ssafy.commitmood.domain.commit.entity.FlaggedToken"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO flagged_token (
+            commit_log_id,
+            token,
+            token_type,
+            weight,
+            created_at,
+            updated_at
+        ) VALUES (
+                     #{commitLogId},
+                     #{token},
+                     #{tokenType},
+                     #{weight},
+                     NOW(),
+                     NOW()
+                 )
+    </insert>
+
+</mapper>

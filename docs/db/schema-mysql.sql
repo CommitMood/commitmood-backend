@@ -1,143 +1,212 @@
--- =========================
--- USER_ACCOUNT
--- =========================
-CREATE TABLE USER_ACCOUNT
-(
-    USER_ACCOUNT_ID   BIGINT AUTO_INCREMENT PRIMARY KEY,                                 -- PK
-    GITHUB_USER_ID    BIGINT       NOT NULL UNIQUE,                                      -- GITHUB USER ID (FROM GITHUB API)
-    GITHUB_LOGIN      VARCHAR(100) NOT NULL UNIQUE,                                      -- GITHUB LOGIN (USERNAME)
-    GITHUB_EMAIL      VARCHAR(150) NULL,                                                 -- GITHUB EMAIL
-    GITHUB_AVATAR_URL VARCHAR(255) NULL,                                                 -- GITHUB PROFILE IMAGE URL
-    GITHUB_NAME       VARCHAR(100) NULL,                                                 -- DISPLAY NAME
-    CREATED_AT        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,                               -- CREATED TIME
-    UPDATED_AT        TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,   -- UPDATED TIME
-    KEY               IDX_GITHUB_LOGIN (GITHUB_LOGIN)                                    -- SEARCH INDEX
+-- BATCH_JOB_INSTANCE
+CREATE TABLE BATCH_JOB_INSTANCE (
+    JOB_INSTANCE_ID BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    VERSION BIGINT,
+    JOB_NAME VARCHAR(100) NOT NULL,
+    JOB_KEY VARCHAR(32) NOT NULL,
+    CONSTRAINT JOB_INST_UN UNIQUE (JOB_NAME, JOB_KEY)
+) ENGINE=InnoDB;
+
+-- BATCH_JOB_EXECUTION
+CREATE TABLE BATCH_JOB_EXECUTION (
+    JOB_EXECUTION_ID BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    VERSION BIGINT,
+    JOB_INSTANCE_ID BIGINT NOT NULL,
+    CREATE_TIME TIMESTAMP(6) NOT NULL,
+    START_TIME TIMESTAMP(6) NULL DEFAULT NULL,
+    END_TIME TIMESTAMP(6) NULL DEFAULT NULL,
+    STATUS VARCHAR(10),
+    EXIT_CODE VARCHAR(2500),
+    EXIT_MESSAGE VARCHAR(2500),
+    LAST_UPDATED TIMESTAMP(6) NULL DEFAULT NULL,
+    CONSTRAINT JOB_INST_EXEC_FK FOREIGN KEY (JOB_INSTANCE_ID)
+        REFERENCES BATCH_JOB_INSTANCE(JOB_INSTANCE_ID)
+) ENGINE=InnoDB;
+
+-- BATCH_JOB_EXECUTION_PARAMS
+CREATE TABLE BATCH_JOB_EXECUTION_PARAMS (
+    JOB_EXECUTION_ID BIGINT NOT NULL,
+    PARAMETER_NAME VARCHAR(100) NOT NULL,
+    PARAMETER_TYPE VARCHAR(100) NOT NULL,
+    PARAMETER_VALUE VARCHAR(2500),
+    IDENTIFYING CHAR(1) NOT NULL,
+    CONSTRAINT JOB_EXEC_PARAMS_FK FOREIGN KEY (JOB_EXECUTION_ID)
+        REFERENCES BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
+) ENGINE=InnoDB;
+
+-- BATCH_STEP_EXECUTION
+CREATE TABLE BATCH_STEP_EXECUTION (
+    STEP_EXECUTION_ID BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    VERSION BIGINT NOT NULL,
+    STEP_NAME VARCHAR(100) NOT NULL,
+    JOB_EXECUTION_ID BIGINT NOT NULL,
+    CREATE_TIME TIMESTAMP(6) NOT NULL,
+    START_TIME TIMESTAMP(6) NULL DEFAULT NULL,
+    END_TIME TIMESTAMP(6) NULL DEFAULT NULL,
+    STATUS VARCHAR(10),
+    COMMIT_COUNT BIGINT,
+    READ_COUNT BIGINT,
+    FILTER_COUNT BIGINT,
+    WRITE_COUNT BIGINT,
+    READ_SKIP_COUNT BIGINT,
+    WRITE_SKIP_COUNT BIGINT,
+    PROCESS_SKIP_COUNT BIGINT,
+    ROLLBACK_COUNT BIGINT,
+    EXIT_CODE VARCHAR(2500),
+    EXIT_MESSAGE VARCHAR(2500),
+    LAST_UPDATED TIMESTAMP(6) NULL DEFAULT NULL,
+    CONSTRAINT JOB_EXEC_STEP_FK FOREIGN KEY (JOB_EXECUTION_ID)
+        REFERENCES BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
+) ENGINE=InnoDB;
+
+-- BATCH_STEP_EXECUTION_CONTEXT
+CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT (
+    STEP_EXECUTION_ID BIGINT NOT NULL PRIMARY KEY,
+    SHORT_CONTEXT VARCHAR(2500) NOT NULL,
+    SERIALIZED_CONTEXT TEXT,
+    CONSTRAINT STEP_EXEC_CTX_FK FOREIGN KEY (STEP_EXECUTION_ID)
+        REFERENCES BATCH_STEP_EXECUTION(STEP_EXECUTION_ID)
+) ENGINE=InnoDB;
+
+-- BATCH_JOB_EXECUTION_CONTEXT
+CREATE TABLE BATCH_JOB_EXECUTION_CONTEXT (
+    JOB_EXECUTION_ID BIGINT NOT NULL PRIMARY KEY,
+    SHORT_CONTEXT VARCHAR(2500) NOT NULL,
+    SERIALIZED_CONTEXT TEXT,
+    CONSTRAINT JOB_EXEC_CTX_FK FOREIGN KEY (JOB_EXECUTION_ID)
+        REFERENCES BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
+) ENGINE=InnoDB;
+
+-- user_account
+CREATE TABLE user_account (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    github_user_id BIGINT NOT NULL UNIQUE,
+    github_login VARCHAR(100) NOT NULL UNIQUE,
+    github_email VARCHAR(150) NULL,
+    github_avatar_url VARCHAR(255) NULL,
+    github_name VARCHAR(100) NULL,
+    last_synced_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- =========================
--- ACCESS_TOKEN
--- =========================
-CREATE TABLE ACCESS_TOKEN
-(
-    ACCESS_TOKEN_ID BIGINT AUTO_INCREMENT PRIMARY KEY,                                   -- PK
-    USER_ACCOUNT_ID BIGINT       NOT NULL,                                               -- FK -> USER_ACCOUNT
-    ACCESS_TOKEN    VARCHAR(255) NOT NULL UNIQUE,                                        -- GITHUB ACCESS TOKEN
-    TOKEN_TYPE      VARCHAR(20) DEFAULT 'BEARER',                                        -- TOKEN TYPE
-    SCOPE           VARCHAR(500) NULL,                                                   -- TOKEN SCOPE
-    EXPIRES_AT      TIMESTAMP NULL,                                                      -- ACCESS TOKEN EXPIRATION TIME
-    CREATED_AT      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,                               -- CREATED TIME
-    UPDATED_AT      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,   -- UPDATED TIME
+CREATE INDEX idx_github_login ON user_account(github_login);
 
-    CONSTRAINT FK_ACCESS_TOKEN_USER FOREIGN KEY (USER_ACCOUNT_ID) REFERENCES USER_ACCOUNT (USER_ACCOUNT_ID) ON DELETE CASCADE,
-
-    KEY             IDX_TOKEN_USER (USER_ACCOUNT_ID)
+-- access_token
+CREATE TABLE access_token (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_account_id BIGINT NOT NULL,
+    access_token VARCHAR(255) NOT NULL UNIQUE,
+    token_type VARCHAR(20) DEFAULT 'BEARER',
+    scope VARCHAR(500) NULL,
+    expires_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_access_token_user FOREIGN KEY (user_account_id)
+        REFERENCES user_account(id) ON DELETE CASCADE
 );
 
--- =========================
--- GITHUB_REPOSITORY
--- =========================
-CREATE TABLE GITHUB_REPOSITORY
-(
-    GITHUB_REPOSITORY_ID  BIGINT AUTO_INCREMENT PRIMARY KEY,                             -- INTERNAL PK (NOT GITHUB ID)
-    OWNER_USER_ACCOUNT_ID BIGINT       NOT NULL,                                         -- REPO OWNER (FK -> USER_ACCOUNT)
-    GITHUB_REPO_ID        BIGINT       NOT NULL UNIQUE,                                  -- GITHUB REPOSITORY ID (FROM GITHUB API)
-    REPOSITORY_NAME       VARCHAR(100) NOT NULL,                                         -- REPO NAME
-    REPOSITORY_FULL_NAME  VARCHAR(200) NOT NULL UNIQUE,                                  -- FULL NAME (OWNER/REPO_NAME, e.g. octocat/Hello-World)
-    DEFAULT_BRANCH        VARCHAR(100) NULL,                                             -- DEFAULT BRANCH
-    DESCRIPTION           TEXT NULL,                                                     -- REPO DESCRIPTION
-    GITHUB_REPOSITORY_URL VARCHAR(255) NULL,                                             -- GITHUB REPOSITORY HTML URL
-    IS_PRIVATE            TINYINT(1) NOT NULL DEFAULT 0,                                 -- PRIVATE 여부
-    LAST_SYNCED_AT        DATETIME NULL,                                                 -- LAST SYNC TIME (FROM GITHUB)
-    CREATED_AT            DATETIME DEFAULT CURRENT_TIMESTAMP,                            -- CREATED TIME
-    UPDATED_AT            DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,-- UPDATED TIME
+CREATE INDEX idx_token_user ON access_token(user_account_id);
 
-    CONSTRAINT FK_GITHUB_REPOSITORY_OWNER FOREIGN KEY (OWNER_USER_ACCOUNT_ID) REFERENCES USER_ACCOUNT (USER_ACCOUNT_ID) ON DELETE CASCADE,
-
-    KEY            IDX_REPOSITORY_OWNER (OWNER_USER_ACCOUNT_ID),
-    KEY            IDX_REPOSITORY_SYNC_TIME (LAST_SYNCED_AT)
+-- github_repo
+CREATE TABLE github_repo (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_account_id BIGINT NOT NULL,
+    github_repo_id BIGINT NOT NULL UNIQUE,
+    github_repo_name VARCHAR(100) NOT NULL,
+    github_repo_full_name VARCHAR(200) NOT NULL UNIQUE,
+    default_branch VARCHAR(150) NULL,
+    description TEXT NULL,
+    github_repo_url VARCHAR(255) NULL,
+    is_private TINYINT(1) NOT NULL DEFAULT 0,
+    last_synced_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_github_repository_owner FOREIGN KEY (user_account_id)
+        REFERENCES user_account(id) ON DELETE CASCADE
 );
 
--- =========================
--- COMMIT_LOG
--- =========================
-CREATE TABLE COMMIT_LOG
-(
-    COMMIT_LOG_ID          BIGINT AUTO_INCREMENT PRIMARY KEY,   -- PK
-    GITHUB_REPOSITORY_ID   BIGINT   NOT NULL,                   -- FK -> GITHUB_REPOSITORY
-    AUTHOR_USER_ACCOUNT_ID BIGINT   NULL,                       -- FK -> USER_ACCOUNT (DELETED USER ALLOWED)
-    GITHUB_COMMIT_SHA      CHAR(40) NOT NULL,                   -- COMMIT SHA (FROM GITHUB)
-    COMMITTED_AT           DATETIME NOT NULL,                   -- COMMIT TIMESTAMP
-    MESSAGE                TEXT     NOT NULL,                   -- COMMIT MESSAGE
-    HTML_URL               VARCHAR(255) NULL,                   -- COMMIT HTML URL
-    ADDITIONS              INT      DEFAULT 0,                  -- LINES ADDED
-    DELETIONS              INT      DEFAULT 0,                  -- LINES DELETED
-    TOTAL_CHANGES          INT      DEFAULT 0,                  -- TOTAL LINES CHANGED
-    FILES_CHANGED          INT NULL,                            -- NUMBER OF CHANGED FILES
-    CREATED_AT             DATETIME DEFAULT CURRENT_TIMESTAMP,  -- CREATED TIME
+CREATE INDEX idx_repository_owner ON github_repo(user_account_id);
+CREATE INDEX idx_repository_sync_time ON github_repo(last_synced_at);
 
-    CONSTRAINT FK_COMMIT_REPO FOREIGN KEY (GITHUB_REPOSITORY_ID) REFERENCES GITHUB_REPOSITORY (GITHUB_REPOSITORY_ID) ON DELETE CASCADE,
-    CONSTRAINT FK_COMMIT_AUTHOR FOREIGN KEY (AUTHOR_USER_ACCOUNT_ID) REFERENCES USER_ACCOUNT (USER_ACCOUNT_ID) ON DELETE SET NULL,
-    UNIQUE KEY UK_COMMIT_REPO_SHA (GITHUB_REPOSITORY_ID, GITHUB_COMMIT_SHA),
-
-    KEY               IDX_COMMIT_AUTHOR_TIME (AUTHOR_USER_ACCOUNT_ID,COMMITTED_AT),
-    KEY               IDX_COMMIT_REPO_TIME (GITHUB_REPOSITORY_ID,COMMITTED_AT)
+-- commit_log
+CREATE TABLE commit_log (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    github_repo_id BIGINT NOT NULL,
+    user_account_id BIGINT NOT NULL,
+    github_commit_sha CHAR(40) NOT NULL,
+    committed_at TIMESTAMP NOT NULL,
+    message TEXT NOT NULL,
+    html_url VARCHAR(255) NULL,
+    additions BIGINT DEFAULT 0,
+    deletions BIGINT DEFAULT 0,
+    total_changes BIGINT DEFAULT 0,
+    files_changed BIGINT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_commit_repo FOREIGN KEY (github_repo_id)
+        REFERENCES github_repo(id) ON DELETE CASCADE,
+    CONSTRAINT fk_commit_author FOREIGN KEY (user_account_id)
+        REFERENCES user_account(id) ON DELETE CASCADE,
+    CONSTRAINT uk_commit_repo_sha UNIQUE (github_repo_id, github_commit_sha)
 );
 
--- =========================
--- COMMIT_FILE_CHANGE
--- =========================
-CREATE TABLE COMMIT_FILE_CHANGE
-(
-    COMMIT_FILE_CHANGE_ID BIGINT AUTO_INCREMENT PRIMARY KEY,                     -- PK
-    COMMIT_LOG_ID         BIGINT       NOT NULL,                                 -- FK -> COMMIT_LOG
-    FILENAME              VARCHAR(500) NOT NULL,                                 -- FILE NAME
-    PREVIOUS_FILENAME     VARCHAR(500) NULL,                                     -- RENAMED PREVIOUS NAME
-    STATUS                ENUM('ADDED','MODIFIED','REMOVED','RENAMED') NOT NULL, -- FILE CHANGE TYPE
-    ADDITIONS             INT          NOT NULL DEFAULT 0,                       -- ADDED LINES
-    DELETIONS             INT          NOT NULL DEFAULT 0,                       -- DELETED LINES
-    CHANGES               INT          NOT NULL DEFAULT 0,                       -- TOTAL LINE CHANGES
-    PATCH                 MEDIUMTEXT NULL,                                       -- DIFF PATCH DATA
-    CREATED_AT            DATETIME DEFAULT CURRENT_TIMESTAMP,                    -- CREATED TIME
+CREATE INDEX idx_commit_author_time ON commit_log(user_account_id, committed_at);
+CREATE INDEX idx_commit_repo_time ON commit_log(github_repo_id, committed_at);
 
-    CONSTRAINT FK_COMMIT_FILE_COMMIT FOREIGN KEY (COMMIT_LOG_ID) REFERENCES COMMIT_LOG (COMMIT_LOG_ID) ON DELETE CASCADE,
-
-    KEY               IDX_FILE_COMMIT (COMMIT_LOG_ID),
-    KEY               IDX_FILE_FILENAME (FILENAME(255))
+-- commit_file_change
+CREATE TABLE commit_file_change (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    commit_log_id BIGINT NOT NULL,
+    filename VARCHAR(500) NOT NULL,
+    prev_filename VARCHAR(500) NULL,
+    status VARCHAR(20) NOT NULL,
+    additions BIGINT NOT NULL DEFAULT 0,
+    deletions BIGINT NOT NULL DEFAULT 0,
+    changes BIGINT NOT NULL DEFAULT 0,
+    patch LONGTEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_commit_file_commit FOREIGN KEY (commit_log_id)
+        REFERENCES commit_log(id) ON DELETE CASCADE,
+    CONSTRAINT chk_file_status CHECK (status IN ('ADDED','MODIFIED','REMOVED','RENAMED'))
 );
 
--- =========================
--- COMMIT_ANALYSIS
--- =========================
-CREATE TABLE COMMIT_ANALYSIS
-(
-    COMMIT_ANALYSIS_ID BIGINT AUTO_INCREMENT PRIMARY KEY,          -- PK
-    COMMIT_LOG_ID      BIGINT NOT NULL UNIQUE,                     -- 1:1 WITH COMMIT_LOG
-    FLAGGED_COUNT      INT    NOT NULL DEFAULT 0,                  -- TOTAL FLAGGED TOKENS COUNT
-    SWEAR_COUNT        INT    NOT NULL DEFAULT 0,                  -- SWEAR WORD COUNT
-    EXCLAIM_COUNT      INT    NOT NULL DEFAULT 0,                  -- EXCLAMATION COUNT
-    EMOJI_COUNT        INT    NOT NULL DEFAULT 0,                  -- EMOJI COUNT
-    SENTIMENT          ENUM('POSITIVE','NEUTRAL','NEGATIVE') NULL, -- ANALYSIS RESULT
-    SENTIMENT_SCORE    DECIMAL(5, 2) NULL,                         -- SENTIMENT SCORE (-1.00 ~ 1.00)
-    ANALYZED_AT        DATETIME        DEFAULT CURRENT_TIMESTAMP,  -- ANALYSIS TIME
+CREATE INDEX idx_file_commit ON commit_file_change(commit_log_id);
+CREATE INDEX idx_file_filename ON commit_file_change(filename);
 
-    CONSTRAINT FK_COMMIT_ANALYSIS_COMMIT FOREIGN KEY (COMMIT_LOG_ID) REFERENCES COMMIT_LOG (COMMIT_LOG_ID) ON DELETE CASCADE
+-- commit_analysis
+CREATE TABLE commit_analysis (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    commit_log_id BIGINT NOT NULL UNIQUE,
+    flagged_count BIGINT NOT NULL DEFAULT 0,
+    swear_count BIGINT NOT NULL DEFAULT 0,
+    exclaim_count BIGINT NOT NULL DEFAULT 0,
+    emoji_count BIGINT NOT NULL DEFAULT 0,
+    sentiment VARCHAR(20) NULL,
+    sentiment_score DECIMAL(5,2) NULL,
+    analyzed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_commit_analysis_commit FOREIGN KEY (commit_log_id)
+        REFERENCES commit_log(id) ON DELETE CASCADE,
+    CONSTRAINT chk_sentiment CHECK (sentiment IN ('POSITIVE','NEUTRAL','NEGATIVE'))
 );
 
--- =========================
--- FLAGGED_TOKEN
--- =========================
-CREATE TABLE FLAGGED_TOKEN
-(
-    FLAGGED_TOKEN_ID BIGINT AUTO_INCREMENT PRIMARY KEY,                                         -- PK
-    COMMIT_LOG_ID    BIGINT       NOT NULL,                                                     -- FK -> COMMIT_LOG
-    TOKEN            VARCHAR(100) NOT NULL,                                                     -- FLAGGED TOKEN TEXT (WORD / SLANG / EMOJI)
-    TOKEN_TYPE       ENUM('SWEAR','SLANG','EMOJI','EMPHASIS','OTHER') NOT NULL DEFAULT 'OTHER', -- FLAGGED TOKEN CATEGORY
-    WEIGHT           INT          NOT NULL DEFAULT 1,                                           -- IMPORTANCE WEIGHT
-    CREATED_AT       DATETIME DEFAULT CURRENT_TIMESTAMP,                                        -- CREATED TIME
-
-    CONSTRAINT FK_FLAGGED_TOKEN_COMMIT FOREIGN KEY (COMMIT_LOG_ID) REFERENCES COMMIT_LOG (COMMIT_LOG_ID) ON DELETE CASCADE,
-    UNIQUE KEY UK_COMMIT_TOKEN (COMMIT_LOG_ID,TOKEN,TOKEN_TYPE),
-
-    KEY        IDX_FLAGGED_COMMIT (COMMIT_LOG_ID),
-    KEY        IDX_FLAGGED_TOKEN_TYPE (TOKEN_TYPE)
+-- flagged_token
+CREATE TABLE flagged_token (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    commit_log_id BIGINT NOT NULL,
+    token VARCHAR(200) NOT NULL,
+    token_type VARCHAR(20) NOT NULL DEFAULT 'OTHER',
+    weight BIGINT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_flagged_token_commit FOREIGN KEY (commit_log_id)
+        REFERENCES commit_log(id) ON DELETE CASCADE,
+    CONSTRAINT uk_commit_token UNIQUE (commit_log_id, token, token_type),
+    CONSTRAINT chk_token_type CHECK (token_type IN ('SWEAR','SLANG','EMOJI','EMPHASIS','OTHER'))
 );
+
+CREATE INDEX idx_flagged_commit ON flagged_token(commit_log_id);
+CREATE INDEX idx_flagged_token_type ON flagged_token(token_type);

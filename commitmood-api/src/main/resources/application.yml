@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    group:
+      local:
+        - local
+        - secret    # 로컬에서만 쓰고 싶으면 유지
+      prod:
+        - prod      # prod는 환경변수 기반으로만 사용
+      docker:
+        - prod      # docker 프로파일 활성화 시 prod 설정 같이 활성화
