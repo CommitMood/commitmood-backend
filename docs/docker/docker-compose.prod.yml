@@ -21,9 +21,7 @@ services:
       - commitmood-net
 
   api:
-    build:
-      context: .
-      dockerfile: ./commitmood-api/Dockerfile # 이미지 없을 경우 자동 빌드
+    image: 904923506932.dkr.ecr.ap-northeast-2.amazonaws.com/commitmood-api:latest
     container_name: commitmood-api
     depends_on:
       - mysql
@@ -33,7 +31,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     ports:
-      - "${API_PORT}:8080"
+      - "8080:8080"
     networks:
       - commitmood-net
 
