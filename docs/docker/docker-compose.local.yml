@@ -22,7 +22,7 @@ services:
 
   api:
     build:
-      context: .
+      context: ../../
       dockerfile: ./commitmood-api/Dockerfile # 이미지 없을 경우 자동 빌드
     container_name: commitmood-api
     depends_on:
