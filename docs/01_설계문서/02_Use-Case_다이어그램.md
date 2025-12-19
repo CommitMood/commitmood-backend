@@ -178,5 +178,52 @@
 
 <br>
 
-본 문서는  
-API 명세, 도메인 모델, 시퀀스 다이어그램 작성의 기준 문서로 활용됩니다.
+## 추가: 유스케이스 plantuml
+```plantuml
+@startuml
+left to right direction
+
+actor User
+actor GitHub
+
+rectangle "CommitMood" {
+
+  usecase "GitHub로 로그인" as UC_Login
+  usecase "GitHub 계정 연동" as UC_Link
+  usecase "커밋 데이터 수집" as UC_Collect
+  usecase "내 커밋 분석 조회" as UC_Analyze
+  usecase "랭킹 조회" as UC_Ranking
+  usecase "명예의 전당 조회" as UC_Hall
+
+  usecase "OAuth 인증 요청" as UC_OAuth
+  usecase "커밋 데이터 요청" as UC_API
+  usecase "커밋 데이터 저장" as UC_Save
+  usecase "감정 키워드 분석" as UC_Filt
+}
+
+User --> UC_Login
+User --> UC_Analyze
+User --> UC_Ranking
+User --> UC_Hall
+
+UC_Login --> UC_Link
+UC_Login ..> UC_OAuth : <<include>>
+
+UC_Collect ..> UC_API : <<include>>
+UC_Collect ..> UC_Save : <<include>>
+UC_Collect ..> UC_Filter : <<include>>
+
+UC_Analyze ..> UC_Collect : <<include>>
+
+UC_Ranking ..> UC_Calc : <<include>>
+
+GitHub --> UC_OAuth
+GitHub --> UC_API
+
+@enduml
+```
+
+<br>
+
+> [!NOTE]
+> 본 문서는 API 명세, 도메인 모델, 시퀀스 다이어그램 작성의 기준 문서로 활용됩니다.
