@@ -15,6 +15,8 @@ public interface UserAccountMapper {
 
     Optional<UserAccount> findById(@Param("id") Long id);
 
+    Optional<UserAccount> findByGithubUserId(@Param("githubUserId") Long githubUserId);
+
     /* 단건 prefix 조회 (LIMIT 1) */
     Optional<UserAccount> findByPrefixOne(@Param("condition") UserAccountQueryCondition condition);
 

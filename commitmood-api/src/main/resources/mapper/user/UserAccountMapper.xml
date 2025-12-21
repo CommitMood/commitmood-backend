@@ -41,6 +41,13 @@
         WHERE id = #{id}
     </select>
 
+    <!-- Find by GitHub User ID -->
+    <select id="findByGithubUserId" resultMap="UserAccountResultMap">
+        SELECT *
+        FROM user_account
+        WHERE github_user_id = #{githubUserId}
+    </select>
+
     <!-- ================================
      🔹 단건 조회 (기존 findByPrefix)
      prefix 기준 첫 번째 결과만 반환
