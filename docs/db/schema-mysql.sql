@@ -210,3 +210,17 @@ CREATE TABLE flagged_token (
 
 CREATE INDEX idx_flagged_commit ON flagged_token(commit_log_id);
 CREATE INDEX idx_flagged_token_type ON flagged_token(token_type);
+
+-- refresh_token
+CREATE TABLE refresh_token (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_account_id BIGINT NOT NULL,
+    token VARCHAR(500) NOT NULL UNIQUE,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_refresh_token_user FOREIGN KEY (user_account_id)
+        REFERENCES user_account(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_refresh_token_user ON refresh_token(user_account_id);
+CREATE INDEX idx_refresh_token_expires ON refresh_token(expires_at);
