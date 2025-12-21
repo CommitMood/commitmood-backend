@@ -465,3 +465,6 @@ commitmood-batch/src/main/resources/*.secret.yml
 /data/*.mv.db
 /data/*.mv.db.lock
 /data/*.trace.db
+
+# === MySQL Local Data Files ===
+docs/docker/mysql
