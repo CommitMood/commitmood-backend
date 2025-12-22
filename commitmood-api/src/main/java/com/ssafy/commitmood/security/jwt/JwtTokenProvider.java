@@ -21,7 +21,7 @@ public class JwtTokenProvider {
 
     public String generateAccessToken(UserAccount user) {
         Date now = new Date();
-        Date expiry = new Date(now.getTime() + jwtProperties.accessTokenExpiry());
+        Date expiry = new Date(now.getTime() + jwtProperties.getAccessTokenExpiry());
 
         return Jwts.builder()
                 .subject(String.valueOf(user.getId()))
@@ -33,8 +33,16 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String generateRefreshToken() {
-        return UUID.randomUUID().toString();
+    public String generateRefreshToken(UserAccount user) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + jwtProperties.getRefreshTokenExpiry());
+
+        return Jwts.builder()
+                .subject(String.valueOf(user.getId()))
+                .issuedAt(now)
+                .expiration(expiry)
+                .signWith(getSigningKey())
+                .compact();
     }
 
     public Long getUserIdFromToken(String token) {
@@ -73,7 +81,7 @@ public class JwtTokenProvider {
     }
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = jwtProperties.secret().getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
