@@ -2,22 +2,21 @@ package com.ssafy.commitmood.security.oauth;
 
 import com.ssafy.commitmood.domain.auth.entity.AccessToken;
 import com.ssafy.commitmood.domain.auth.entity.RefreshToken;
-import com.ssafy.commitmood.security.mapper.AccessTokenMapper;
-import com.ssafy.commitmood.security.mapper.RefreshTokenMapper;
 import com.ssafy.commitmood.security.config.AppProperties;
 import com.ssafy.commitmood.security.jwt.JwtProperties;
 import com.ssafy.commitmood.security.jwt.JwtTokenProvider;
+import com.ssafy.commitmood.security.mapper.AccessTokenMapper;
+import com.ssafy.commitmood.security.mapper.RefreshTokenMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -30,20 +29,42 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final AccessTokenMapper accessTokenMapper;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+    public void onAuthenticationSuccess(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Authentication authentication
+    ) throws IOException {
+
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+        var userAccount = oAuth2User.getUserAccount();
 
-        String jwtAccessToken = jwtTokenProvider.generateAccessToken(oAuth2User.getUserAccount());
-        String jwtRefreshToken = jwtTokenProvider.generateRefreshToken();
+        // 1. Refresh Token 생성 (JWT)
+        String refreshToken = jwtTokenProvider.generateRefreshToken(userAccount);
 
-        saveRefreshToken(oAuth2User.getUserAccount().getId(), jwtRefreshToken);
-        saveGithubAccessToken(oAuth2User.getUserAccount().getId(), oAuth2User.getAccessToken());
+        // 1-1. Access Token 생성 (JWT)
+        String accessToken = jwtTokenProvider.generateAccessToken(userAccount);
 
-        addCookie(response, "accessToken", jwtAccessToken, (int) (jwtProperties.accessTokenExpiry() / 1000));
-        addCookie(response, "refreshToken", jwtRefreshToken, (int) (jwtProperties.refreshTokenExpiry() / 1000));
+        // 2. Refresh Token DB 저장
+        saveRefreshToken(userAccount.getId(), refreshToken);
 
-        String redirectUrl = appProperties.frontendUrl() + "/oauth/callback";
+        // 3. GitHub Access Token 저장 (서버 내부용)
+        saveGithubAccessToken(
+                userAccount.getId(),
+                oAuth2User.getAccessToken()
+        );
+
+        // 4. Refresh Token을 HttpOnly Cookie로 전달
+        addCookie(
+                response,
+                "refreshToken",
+                refreshToken,
+                (int) (jwtProperties.getRefreshTokenExpiry() / 1000)
+        );
+
+        // 5. 프론트엔드 OAuth Callback으로 redirect
+        String redirectUrl = appProperties.frontendUrl()
+                + "/oauth/callback"
+                + "?accessToken=" + accessToken;
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 
@@ -51,8 +72,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         refreshTokenMapper.deleteByUserAccountId(userAccountId);
 
         LocalDateTime expiresAt = LocalDateTime.now()
-                .plusSeconds(jwtProperties.refreshTokenExpiry() / 1000);
-        RefreshToken refreshToken = RefreshToken.create(userAccountId, token, expiresAt);
+                .plusSeconds(jwtProperties.getRefreshTokenExpiry() / 1000);
+
+        RefreshToken refreshToken = RefreshToken.create(
+                userAccountId,
+                token,
+                expiresAt
+        );
         refreshTokenMapper.insert(refreshToken);
     }
 
@@ -69,14 +95,20 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         accessTokenMapper.insert(accessToken);
     }
 
-    private void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
+    private void addCookie(
+            HttpServletResponse response,
+            String name,
+            String value,
+            int maxAge
+    ) {
         ResponseCookie cookie = ResponseCookie.from(name, value)
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)      // local 환경
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(maxAge)
                 .build();
+
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 }
