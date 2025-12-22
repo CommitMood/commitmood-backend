@@ -7,24 +7,24 @@
     <resultMap id="RefreshTokenResultMap" type="com.ssafy.commitmood.domain.auth.entity.RefreshToken">
         <id property="id" column="id"/>
         <result property="userAccountId" column="user_account_id"/>
-        <result property="token" column="token"/>
+        <result property="token" column="refresh_token"/>
         <result property="expiresAt" column="expires_at"/>
         <result property="createdAt" column="created_at"/>
     </resultMap>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO refresh_token (user_account_id, token, expires_at)
+        INSERT INTO refresh_token (user_account_id, refresh_token, expires_at)
         VALUES (#{userAccountId}, #{token}, #{expiresAt})
     </insert>
 
     <select id="findByToken" resultMap="RefreshTokenResultMap">
-        SELECT id, user_account_id, token, expires_at, created_at
+        SELECT id, user_account_id, refresh_token, expires_at, created_at
         FROM refresh_token
-        WHERE token = #{token}
+        WHERE refresh_token = #{token}
     </select>
 
     <select id="findByUserAccountId" resultMap="RefreshTokenResultMap">
-        SELECT id, user_account_id, token, expires_at, created_at
+        SELECT id, user_account_id, refresh_token, expires_at, created_at
         FROM refresh_token
         WHERE user_account_id = #{userAccountId}
     </select>
@@ -36,7 +36,7 @@
 
     <delete id="deleteByToken">
         DELETE FROM refresh_token
-        WHERE token = #{token}
+        WHERE refresh_token = #{token}
     </delete>
 
     <delete id="deleteExpiredTokens">
