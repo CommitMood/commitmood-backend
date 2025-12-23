@@ -4,6 +4,20 @@ spring:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+            scope: read:user,user:email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider:
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
 
 mybatis:
   mapper-locations: classpath:/mapper/**/*.xml
@@ -24,3 +38,12 @@ springdoc:
 logging:
   level:
     com.ssafy.commitmood: DEBUG
+
+jwt:
+  secure: true
+  secret: ${JWT_SECRET}
+  access-token-expiry: 3600000
+  refresh-token-expiry: 604800000
+
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
