@@ -103,7 +103,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     ) {
         ResponseCookie cookie = ResponseCookie.from(name, value)
                 .httpOnly(true)
-                .secure(false)      // local 환경
+                .secure(true)
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(maxAge)
