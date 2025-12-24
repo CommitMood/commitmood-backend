@@ -55,9 +55,9 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/auth/token",
                                 "/login/**",
-                                "/oauth2/**"
+                                "/oauth2/**",
+                                "/users/search/**"
                         ).permitAll()
-                        // ❗ /auth/me 는 permitAll 하면 안 됨
                         .anyRequest().authenticated()
                 )
 
