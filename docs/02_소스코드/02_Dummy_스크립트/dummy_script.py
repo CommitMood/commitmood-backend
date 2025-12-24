@@ -1,10 +1,16 @@
 import os
 import random
 import uuid
-
 from faker import Faker
 
 fake = Faker()
+
+
+# =========================
+# util
+# =========================
+def sha():
+    return uuid.uuid4().hex.ljust(40, "0")
 
 
 def random_source_file():
@@ -19,16 +25,20 @@ def random_source_file():
         ("config", ["yml", "yaml", "json", "xml", "properties"], ["config", "resources"]),
         ("misc", ["md", "sql", "sh", "dockerfile"], ["docs", "scripts", "."]),
     ]
+
     _, exts, dirs = random.choice(groups)
     ext = random.choice(exts)
     directory = random.choice(dirs)
     filename = fake.file_name(extension=ext)
-    if directory == ".":
-        return filename
-    return f"{directory}/{filename}"
+
+    return filename if directory == "." else f"{directory}/{filename}"
 
 
+# =========================
+# commit message data (절대 축소 금지)
+# =========================
 commit_types = ["feat", "fix", "refactor", "chore", "docs", "test", "perf", "build", "ci"]
+
 commit_subjects = [
     "add login API", "implement oauth2 refresh token", "add commit detail page", "add github webhook listener",
     "add user notification center", "add refreshable dashboard widgets", "add repo search filtering",
@@ -81,77 +91,124 @@ commit_subjects = [
 def make_commit_message():
     base = f"{random.choice(commit_types)}: {random.choice(commit_subjects)}"
     if random.random() < random.uniform(0.20, 0.30):
-        bad_words = ["shit", "wtf", "bull", "damn", "bloated", "messy", "lazy", "hack",
-                     "workaround", "quickfix", "temporary", "dirty", "ugly", "nonsense", "unstable", "why"]
-        injected = base + " " + random.choice(bad_words)
-        return injected.replace("'", "''")
+        bad_words = [
+            "shit", "wtf", "bull", "damn", "bloated", "messy", "lazy", "hack",
+            "workaround", "quickfix", "temporary", "dirty", "ugly",
+            "nonsense", "unstable", "why"
+        ]
+        base += " " + random.choice(bad_words)
     return base.replace("'", "''")
 
 
+# =========================
+# volume
+# =========================
 USER_COUNT = 50
 REPO_COUNT = 120
 COMMIT_COUNT = 20_000
 FILE_CHANGE_COUNT = 30_000
 
 
-def sha(): return uuid.uuid4().hex.ljust(40, '0')
-
-
+# =========================
+# output
+# =========================
 os.makedirs("generated", exist_ok=True)
-f_user = open("generated/1_user.sql", "w")
-f_repo = open("generated/2_repo.sql", "w")
-f_commit = open("generated/3_commit.sql", "w")
-f_file = open("generated/4_commit_file.sql", "w")
-f_analysis = open("generated/5_analysis.sql", "w")
-f_token = open("generated/6_token.sql", "w")
 
-user_ids = []
-for i in range(USER_COUNT):
-    uid = i + 1
-    user_ids.append(uid)
+f_user = open("generated/01_user.sql", "w")
+f_repo = open("generated/02_repo.sql", "w")
+f_commit = open("generated/03_commit.sql", "w")
+f_file = open("generated/04_commit_file.sql", "w")
+f_analysis = open("generated/05_commit_analysis.sql", "w")
+f_token = open("generated/06_flagged_token.sql", "w")
+
+
+# =========================
+# 1. user_account (ID 위임)
+# =========================
+for _ in range(USER_COUNT):
     f_user.write(
-        f"INSERT INTO user_account (id,github_user_id,github_login,github_email,github_name)"
-        f" VALUES({uid},{fake.random_int() % 9999999},'{fake.user_name()}','{fake.email()}','{fake.name()}');\n"
+        f"INSERT INTO user_account "
+        f"(github_user_id, github_login, github_email, github_name) "
+        f"VALUES ("
+        f"{fake.random_int() % 9_999_999},"
+        f"'{fake.user_name()}',"
+        f"'{fake.email()}',"
+        f"'{fake.name()}'"
+        f");\n"
     )
 
-repo_ids = []
+
+# =========================
+# 2. github_repo
+# =========================
 for i in range(REPO_COUNT):
-    rid = i + 1
-    repo_ids.append(rid)
-    owner = random.choice(user_ids)
+    owner_id = random.randint(1, USER_COUNT)
     name = fake.word() + "-" + fake.word()
-    full = f"user{owner}/{name}"
+    full = f"user{owner_id}/{name}"
+
     f_repo.write(
-        f"INSERT INTO github_repo (id,user_account_id,github_repo_id,github_repo_name,github_repo_full_name)"
-        f" VALUES({rid},{owner},{100000 + rid},'{name}','{full}');\n"
+        f"INSERT INTO github_repo "
+        f"(user_account_id, github_repo_id, github_repo_name, github_repo_full_name) "
+        f"VALUES ("
+        f"{owner_id},"
+        f"{100_000 + i},"
+        f"'{name}',"
+        f"'{full}'"
+        f");\n"
     )
 
-commit_ids = []
+
+# =========================
+# 3. commit_log
+# =========================
 commit_messages = {}
 
-for i in range(COMMIT_COUNT):
-    cid = i + 1
-    commit_ids.append(cid)
+for cid in range(1, COMMIT_COUNT + 1):
     msg = make_commit_message()
     commit_messages[cid] = msg
+    days = random.randint(0, 365)
+
     f_commit.write(
-        f"INSERT INTO commit_log (id,github_repo_id,user_account_id,github_commit_sha,committed_at,message,additions,deletions,total_changes)"
-        f" VALUES({cid},{random.choice(repo_ids)},{random.choice(user_ids)},'{sha()}',"
-        f"DATE_SUB(NOW(), INTERVAL {random.randint(0,365)} DAY),"
-        f"'{msg}',{random.randint(0,300)},{random.randint(0,100)},{random.randint(0,400)});\n"
+        f"INSERT INTO commit_log "
+        f"(github_repo_id, user_account_id, github_commit_sha, committed_at, "
+        f"message, additions, deletions, total_changes) "
+        f"VALUES ("
+        f"{random.randint(1, REPO_COUNT)},"
+        f"{random.randint(1, USER_COUNT)},"
+        f"'{sha()}',"
+        f"CURRENT_TIMESTAMP - INTERVAL '{days}' DAY,"
+        f"'{msg}',"
+        f"{random.randint(0,300)},"
+        f"{random.randint(0,100)},"
+        f"{random.randint(0,400)}"
+        f");\n"
     )
 
-for i in range(FILE_CHANGE_COUNT):
-    fid = i + 1
-    c = random.choice(commit_ids)
-    name = random_source_file()
-    status = random.choice(['ADDED', 'MODIFIED', 'REMOVED', 'RENAMED'])
-    add, delete = random.randint(0, 200), random.randint(0, 150)
+
+# =========================
+# 4. commit_file_change
+# =========================
+for _ in range(FILE_CHANGE_COUNT):
+    add = random.randint(0, 200)
+    delete = random.randint(0, 150)
+
     f_file.write(
-        f"INSERT INTO commit_file_change (id,commit_log_id,filename,status,additions,deletions,changes)"
-        f" VALUES({fid},{c},'{name}','{status}',{add},{delete},{add + delete});\n"
+        f"INSERT INTO commit_file_change "
+        f"(commit_log_id, filename, status, additions, deletions, changes) "
+        f"VALUES ("
+        f"{random.randint(1, COMMIT_COUNT)},"
+        f"'{random_source_file()}',"
+        f"'{random.choice(['ADDED','MODIFIED','REMOVED','RENAMED'])}',"
+        f"{add},"
+        f"{delete},"
+        f"{add + delete}"
+        f");\n"
     )
 
+
+# =========================
+# 5. analysis + flagged_token
+# =========================
 keywords = [
     "wtf", "shit", "damn", "fuck", "bull", "nonsense",
     "quickfix", "temporary", "temp", "hotfix", "workaround", "bypass",
@@ -160,19 +217,39 @@ keywords = [
     "lazy", "please ignore", "no test", "spam", "unfinished", "sleep",
 ]
 
-for cid in commit_ids:
+for cid in range(1, COMMIT_COUNT + 1):
     score = round(random.uniform(-1, 1), 2)
     senti = "POSITIVE" if score > 0.3 else "NEGATIVE" if score < -0.3 else "NEUTRAL"
+
     f_analysis.write(
-        f"INSERT INTO commit_analysis (commit_log_id,sentiment,sentiment_score,flagged_count,swear_count,exclaim_count,emoji_count)"
-        f" VALUES({cid},'{senti}',{score},{random.randint(0, 5)},{random.randint(0, 2)},{random.randint(0, 3)},{random.randint(0, 3)});\n"
+        f"INSERT INTO commit_analysis "
+        f"(commit_log_id, sentiment, sentiment_score, "
+        f"flagged_count, swear_count, exclaim_count, emoji_count) "
+        f"VALUES ("
+        f"{cid},"
+        f"'{senti}',"
+        f"{score},"
+        f"{random.randint(0,5)},"
+        f"{random.randint(0,2)},"
+        f"{random.randint(0,3)},"
+        f"{random.randint(0,3)}"
+        f");\n"
     )
+
     msg_lower = commit_messages[cid].lower()
     found = [k for k in keywords if k in msg_lower][:3]
+
     for token in found:
         f_token.write(
-            f"INSERT INTO flagged_token (commit_log_id,token,token_type,weight)"
-            f" VALUES({cid},'{token}','SWEAR',{random.randint(1, 3)});\n"
+            f"INSERT INTO flagged_token "
+            f"(commit_log_id, token, token_type, weight) "
+            f"VALUES ("
+            f"{cid},"
+            f"'{token}',"
+            f"'SWEAR',"
+            f"{random.randint(1,3)}"
+            f");\n"
         )
 
-print("\n🎉 SQL 파일 생성 완료 → generated/ 폴더 확인\n")
+
+print("\nSQL 파일 생성 완료 → generated/ 폴더 확인\n")
