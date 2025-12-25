@@ -1,5 +1,9 @@
 ![rect](https://capsule-render.vercel.app/api?type=rect&color=gradient&text=🌙%20CommitMood%20&fontAlign=25&fontSize=25&textBg=true&desc=개발자의%20감정을%20커밋%20메시지로%20%20읽어내는%20서비스&descAlign=69&descAlignY=50)
 
+[🎬 SSAFY 관통 프로젝트 시연 영상](https://drive.google.com/file/d/1yeL9td6GfTxGJUjtlfw2gefSccB0CenK/view?usp=share_link)
+
+<br>
+
 ## 📋 목차
 
 - [📖 프로젝트 소개](#-프로젝트-소개)
